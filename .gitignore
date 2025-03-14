@@ -1,0 +1,40 @@
+# Environment variables and secrets
+.env
+
+# Logs and debugging
+*.log
+trace.out
+
+# Dependency directories
+/bin/
+/pkg/
+/vendor/
+
+# Build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+*.out
+*.a
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.cache
+
+# Go build cache
+/go-build/
+/testdata/
+
+# Go module files
+
+
+# Custom files
+issuessolved.txt
+prmpt.mg
