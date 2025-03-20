@@ -1,0 +1,18 @@
+chceck for bug why api is calling multiple times evil with timer, the timer probably dont work well
+
+
+review api/handlers.go 
+
+chnage the ui template to fit hyper ui
+
+instead of saving log erros in sqlite, log them in excel and send via email
+
+htmlCache data for 13 hrs
+
+use hyperui
+
+edit this prompt it and use it 3 times in 
+
+// new
+add company icon to the models and db
+ create monorepo for test code base, nextjs base and the go base
