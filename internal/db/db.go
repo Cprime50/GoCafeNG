@@ -52,6 +52,7 @@ func InitDB(connStr string) (*sql.DB, error) {
 	return db, nil
 }
 
+// TODO chnage this to be logged in excel instead
 // InitSQLite initializes an in-memory SQLite database for logging
 func InitSQLite() (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", ":memory:")

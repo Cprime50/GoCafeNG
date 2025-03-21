@@ -21,10 +21,7 @@ The API uses a secure authentication mechanism with a single API key and request
 For each API request, you need to:
 1. Use your API key for the `X-API-Key` header
 2. Generate a Unix timestamp (seconds since epoch) for the `X-Timestamp` header
-3. Create an HMAC-SHA256 signature using:
-   - Message = `{request_path}{timestamp}`
-   - Key = Your API key
-4. Include the generated signature in the `X-Signature` header
+
 
 This prevents request tampering and replay attacks. The timestamp must be within 5 minutes of the server time.
 
@@ -88,17 +85,9 @@ Returns all jobs from the database.
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 const API_KEY = process.env.API_KEY || 'your_api_key_here';
 
-// Generate signature for API requests
-function generateSignature(path: string, timestamp: string): string {
-  // In a real app, you should implement this on the server-side for security
-  // This is a client-side example using the crypto-js library
-  const message = path + timestamp;
-  const CryptoJS = require('crypto-js');
-  const hash = CryptoJS.HmacSHA256(message, API_KEY);
-  return CryptoJS.enc.Hex.stringify(hash);
+
 }
 
-// Fetch all jobs
 export async function getAllJobs() {
   try {
     const path = '/api/jobs';
@@ -110,7 +99,6 @@ export async function getAllJobs() {
       headers: {
         'X-API-Key': API_KEY,
         'X-Timestamp': timestamp,
-        'X-Signature': signature,
         'Content-Type': 'application/json'
       }
     });
@@ -129,7 +117,6 @@ export async function getAllJobs() {
   }
 }
 
-// Check API status
 export async function checkApiStatus() {
   try {
     const path = '/api/status';
@@ -176,20 +163,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const path = '/api/jobs';
     const timestamp = Math.floor(Date.now() / 1000).toString();
     
-    // Generate signature using server-side crypto
-    const message = path + timestamp;
-    const signature = crypto
-      .createHmac('sha256', API_KEY)
-      .update(message)
-      .digest('hex');
-    
-    // Make the request to the actual API
     const response = await fetch(`${API_URL}${path}`, {
       method: 'GET',
       headers: {
         'X-API-Key': API_KEY,
         'X-Timestamp': timestamp,
-        'X-Signature': signature,
       },
     });
     
@@ -219,11 +197,9 @@ For testing with cURL, you can use a script to generate the proper headers:
 API_KEY="your_api_key_here"
 ENDPOINT="/api/jobs"
 TIMESTAMP=$(date +%s)
-SIGNATURE=$(echo -n "${ENDPOINT}${TIMESTAMP}" | openssl dgst -sha256 -hmac "${API_KEY}" | cut -d ' ' -f2)
 
 curl -H "X-API-Key: ${API_KEY}" \
      -H "X-Timestamp: ${TIMESTAMP}" \
-     -H "X-Signature: ${SIGNATURE}" \
      "http://localhost:8080${ENDPOINT}"
 ```
 

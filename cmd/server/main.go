@@ -24,6 +24,10 @@ func main() {
 		log.Fatal("Failed to load configuration:", err)
 	}
 
+	if config.APIKey == "" {
+		log.Fatal("API Key must be set in configuration")
+	}
+
 	// Initialize SQLite for logging
 	sqliteDB, err := db.InitSQLite()
 	if err != nil {
@@ -67,11 +71,6 @@ func main() {
 		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
-
-	// Print API key information (only in logs, for admin to see)
-	log.Printf("API Authentication configured:")
-	log.Printf("  - API_KEY: %s", config.APIKey)
-	log.Printf("  - Allowed Origins: %v", config.AllowedOrigins)
 
 	// Start job scheduler
 	scheduler := services.StartJobScheduler(postgresDB, sqliteDB, jobFetcher)

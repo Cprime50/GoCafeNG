@@ -21,10 +21,13 @@ func CORSMiddleware(allowedOrigins []string) func(http.Handler) http.Handler {
 					break
 				}
 			}
-			if allowed {
+			if allowed && origin != "" {
 				w.Header().Set("Access-Control-Allow-Origin", origin)
-			} else if len(allowedOrigins) > 0 {
+			} else if len(allowedOrigins) > 0 && allowedOrigins[0] != "*" {
 				w.Header().Set("Access-Control-Allow-Origin", allowedOrigins[0])
+			} else {
+				http.Error(w, "CORS Forbidden", http.StatusForbidden)
+				return
 			}
 
 			w.Header().Set("Access-Control-Max-Age", "600")
@@ -50,8 +53,8 @@ func APIKeyAuthMiddleware(cfg *config.Config) func(http.Handler) http.Handler {
 			}
 
 			if subtle.ConstantTimeCompare([]byte(apiKey), []byte(cfg.APIKey)) != 1 {
-				log.Printf("[AUTH FAIL] %s %s from %s - Invalid API Key: %s", r.Method, r.URL.Path, r.RemoteAddr, apiKey)
-				http.Error(w, "Unauthorized: Invalid API key", http.StatusUnauthorized)
+				log.Printf("[AUTH FAIL] %s %s from %s - Invalid API Key attempt", r.Method, r.URL.Path, r.RemoteAddr)
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
 				return
 			}
 
@@ -83,3 +86,6 @@ func SecurityHeadersMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
+
+// TODO might add rate limiti later if needed
