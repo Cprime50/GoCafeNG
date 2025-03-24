@@ -14,6 +14,7 @@ import (
 type Config struct {
 	RapidAPIKey        string
 	ApifyAPIKey        string
+	Mode               string
 	PostgresConnection string
 	Port               string
 	DBConnStr          string
@@ -30,6 +31,7 @@ func LoadConfig() (*Config, error) {
 	config := &Config{
 		RapidAPIKey:    os.Getenv("RAPID_API_KEY"),
 		ApifyAPIKey:    os.Getenv("APIFY_API_KEY"),
+		Mode:           os.Getenv("MODE"),
 		Port:           os.Getenv("PORT"),
 		DBConnStr:      os.Getenv("POSTGRES_CONNECTION"),
 		APIKey:         os.Getenv("API_KEY"),
@@ -45,6 +47,12 @@ func LoadConfig() (*Config, error) {
 		secret := "go9jajobs_api_key_" + randomString(32)
 		log.Fatal("⚠️  API_KEY not set. Generating a strong secret...", secret)
 
+	}
+
+	// Warn if secrets are missing
+	if config.Mode == "" {
+		log.Fatal("⚠️  MODE not set. Defaulting to 'dev'")
+		config.Mode = "dev"
 	}
 
 	return config, nil

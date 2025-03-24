@@ -21,7 +21,7 @@ services:
       - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    restart: unless-stopped
+    # restart: unless-stopped 
 
 volumes:
   postgres_data:

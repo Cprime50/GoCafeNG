@@ -32,7 +32,6 @@ func FetchAndSaveJSearch(jobFetcher *fetcher.JobFetcher, postgresDB *sql.DB, sql
 		db.LogAPISync(sqliteDB, "JSearch", count, "Partial Success", err.Error())
 	} else {
 		log.Printf("Successfully saved %d JSearch jobs", count)
-		db.LogAPISync(sqliteDB, "JSearch", count, "Success", "")
 	}
 }
 
@@ -55,7 +54,6 @@ func FetchAndSaveIndeed(jobFetcher *fetcher.JobFetcher, postgresDB *sql.DB, sqli
 		db.LogAPISync(sqliteDB, "Indeed", count, "Partial Success", err.Error())
 	} else {
 		log.Printf("Successfully saved %d Indeed jobs", count)
-		db.LogAPISync(sqliteDB, "Indeed", count, "Success", "")
 	}
 }
 
@@ -80,10 +78,30 @@ func FetchAndSaveLinkedIn(jobFetcher *fetcher.JobFetcher, postgresDB *sql.DB, sq
 		db.LogAPISync(sqliteDB, "LinkedIn", count, "Partial Success", err.Error())
 	} else {
 		log.Printf("Successfully saved %d LinkedIn jobs", count)
-		db.LogAPISync(sqliteDB, "LinkedIn", count, "Success", "")
+	}
+}
+func FetchAndSaveApifyLinkedIn(jobFetcher *fetcher.JobFetcher, postgresDB *sql.DB, sqliteDB *sql.DB) {
+	log.Println("Fetching LinkedIn jobs...")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+	jobs, err := jobFetcher.FetchApifyLinkedInJobs(ctx)
+	if err != nil {
+		log.Println("Error fetching apifyLinkedIn jobs:", err)
+		db.LogAPISync(sqliteDB, "apifyLinkedIn", 0, "Failed", err.Error())
+		return
+	}
+
+	count, err := db.SaveJobsToDB(ctx, postgresDB, jobs)
+	if err != nil {
+		log.Println("Error saving apifyLinkedIn jobs:", err)
+		db.LogAPISync(sqliteDB, "apifyLinkedIn", count, "Partial Success", err.Error())
+	} else {
+		log.Printf("Successfully saved %d apifyLinkedIn jobs", count)
 	}
 }
 
+// TODO use more than one linkedin api and use Day to schedule them instead of time, like run one at 12 am, the other 6 or something like that
 // StartJobScheduler runs job fetching on scheduled intervals using gocron
 func StartJobScheduler(postgresDB *sql.DB, sqliteDB *sql.DB, jobFetcher *fetcher.JobFetcher) *gocron.Scheduler {
 	scheduler := gocron.NewScheduler(time.UTC)
@@ -99,6 +117,9 @@ func StartJobScheduler(postgresDB *sql.DB, sqliteDB *sql.DB, jobFetcher *fetcher
 	scheduler.Every(48).Hours().StartAt(time.Now().Add(48*time.Hour)).Do(FetchAndSaveLinkedIn, jobFetcher, postgresDB, sqliteDB)
 	//scheduler.Every(1).Minute().StartAt(time.Now().Add(1* time.Minute)).Do(FetchAndSaveLinkedIn, jobFetcher, postgresDB, sqliteDB)
 
+	// Schedule apifyLinkedIn jobs
+	scheduler.Every(24).Hours().StartAt(time.Now().Add(48*time.Hour)).Do(FetchAndSaveApifyLinkedIn, jobFetcher, postgresDB, sqliteDB)
+
 	// Start the scheduler asynchronously
 	scheduler.StartAsync()
 
@@ -107,5 +128,3 @@ func StartJobScheduler(postgresDB *sql.DB, sqliteDB *sql.DB, jobFetcher *fetcher
 
 	return scheduler
 }
-
-

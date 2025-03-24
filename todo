@@ -1,18 +1,974 @@
-chceck for bug why api is calling multiple times evil with timer, the timer probably dont work well
+add a rate limiter with like 4 calls per 10hrs
+
+Make Docker db stop when computer shut off and u havev to run the code to restart
+but in production make it opposite for sqlite db let it be persistent
+
+companys to ban
+corssover
+canonical
+
+// add logo to the jobs model
+
+// every 24hrs same with the indeed 24hrs
+//Linkedin Jobs Scraper - PPR
+# Set API token
+API_TOKEN=<YOUR_API_TOKEN>
+
+# Prepare Actor  
+cat > input.json <<'EOF'
+{
+  "urls": [
+    "https://www.linkedin.com/jobs/search/?distance=25&geoId=105365761&keywords=golang"
+  ],
+  "scrapeCompany": true,
+  "count": 100
+}
+EOF
+
+# Run the Actor
+curl "https://api.apify.com/v2/acts/hKByXkMQaC5Qt9UMN/runs?token=$API_TOKEN" \
+  -X POST \
+  -d @input.json \
+  -H 'Content-Type: application/json'
 
 
-review api/handlers.go 
+sample response
+[
+    {
+        "id": "4188632929",
+        "trackingId": "IDDYYtX6oPoM/sZN5WcHrw==",
+        "refId": "T0Ld7/hw2k/AZQxQjej1lw==",
+        "link": "https://ng.linkedin.com/jobs/view/senior-frontend-mobile-developer-at-njia-hub-4188632929?refId=T0Ld7%2Fhw2k%2FAZQxQjej1lw%3D%3D&trackingId=IDDYYtX6oPoM%2FsZN5WcHrw%3D%3D&position=25&pageNum=0",
+        "title": "Senior FrontEnd / Mobile Developer",
+        "companyName": "Njia Hub",
+        "companyLinkedinUrl": "https://www.linkedin.com/company/njia-hub?trk=public_jobs_jserp-result_job-search-card-subtitle",
+        "companyLogo": "https://media.licdn.com/dms/image/v2/D4E0BAQGw_3LTjsvXmA/company-logo_100_100/company-logo_100_100/0/1707970805383/njia_hub_logo?e=2147483647&v=beta&t=NFdNTe1a6hnh5LwH4-jHFx9vApY4Na1BUeaJcoY-k3U",
+        "location": "Nigeria",
+        "salaryInfo": [
+            ""
+        ],
+        "benefits": [],
+        "descriptionHtml": "<p><strong>About Us</strong></p><p><strong>NjiaHub is on a mission to empower consumers in Nigeria with the tools to make informed purchasing decisions. As we launch our first flagship project Maoni, we’re looking for a highly skilled Mid Level Full Stack Engineer</strong> with a strong focus on front-end development to join our dynamic team.</p><p>This role demands expertise in Java Script, React Native, and Expo. Backend development using Golang is a big Bonus. The ideal candidate is a team player with a passion for building scalable, user-centric applications and the ability to collaborate across multiple time zones.</p><p><strong>Key Responsibilities</strong></p><ul><li><strong>Front-End Development:</strong></li><li><strong>Design and development of responsive, cross-platform mobile applications using TypeScript, React Native, and Expo.</strong></li><li>Ensure a seamless user experience through high-quality UI/UX implementation.</li><li>Collaborate with senior engineers and design teams to translate wireframes and mockups into functional applications.</li></ul><p><br></p><ul><li><strong>Collaboration &amp; Communication:</strong></li><li>Work closely with cross-functional teams, including designers, product managers, and other engineers<strong>.</strong></li><li>Collaborate effectively across time zones, ensuring timely progress and delivery.</li><li>Participate in code reviews, mentoring, and knowledge sharing.</li><li><strong>DevOps &amp; Deployment:</strong></li><li><strong>Contribute to CI/CD pipelines and ensure smooth deployment processes.</strong></li><li>Monitor and troubleshoot issues in production environments.</li></ul><p><br></p><p><strong>RequirementsTechnical Skills:</strong></p><ul><li><strong>Minimum of 5 years experience in mobile development.</strong></li><li><strong>Expert-level experience with React Native CLI and Expo.</strong></li><li>Proficiency in JavaScript/TypeScript and modern front-end workflows.</li><li>Experience with mobile app optimization for performance and responsiveness.</li><li>Experience with RESTful APIs, GraphQL, and database systems (e.g., PostgreSQL, MongoDB).</li></ul><p><br></p><p><strong>Other Requirements:</strong></p><ul><li>Proven track record of delivering high-quality, scalable applications.</li><li>Excellent problem-solving and debugging skills.</li><li>Strong written and verbal communication skills to work effectively across time zones.</li><li>Ability to manage competing priorities and deliver on deadlines.</li></ul><p><strong>Nice-to-Haves</strong></p><ul><li>Familiarity with performance monitoring tools like Sentry, New Relic, or similar.</li><li>Experience working in startup environments.</li><li>Golang</li><li>Knowledge of mobile-specific challenges such as battery optimization and push notifications.</li></ul><p><strong>What We Offer</strong></p><ul><li>Competitive salary and benefits. N300k - N500K</li><li>Flexible working hours and a fully remote environment.</li><li>Opportunity to shape the future of a fast-growing app with a meaningful mission.</li><li>A supportive and collaborative team that values innovation and growth.</li></ul><p><strong>Ready to Join Us?</strong></p><ul><li><strong>If you’re excited about building impactful technology that shapes consumer experiences, we’d love to hear from you! Apply now and become part of Maoni App’s journey.</strong></li></ul>",
+        "applicantsCount": "46",
+        "applyUrl": "",
+        "descriptionText": "About UsNjiaHub is on a mission to empower consumers in Nigeria with the tools to make informed purchasing decisions. As we launch our first flagship project Maoni, we’re looking for a highly skilled Mid Level Full Stack Engineer with a strong focus on front-end development to join our dynamic team.This role demands expertise in Java Script, React Native, and Expo. Backend development using Golang is a big Bonus. The ideal candidate is a team player with a passion for building scalable, user-centric applications and the ability to collaborate across multiple time zones.Key ResponsibilitiesFront-End Development:Design and development of responsive, cross-platform mobile applications using TypeScript, React Native, and Expo.Ensure a seamless user experience through high-quality UI/UX implementation.Collaborate with senior engineers and design teams to translate wireframes and mockups into functional applications.Collaboration &amp; Communication:Work closely with cross-functional teams, including designers, product managers, and other engineers.Collaborate effectively across time zones, ensuring timely progress and delivery.Participate in code reviews, mentoring, and knowledge sharing.DevOps &amp; Deployment:Contribute to CI/CD pipelines and ensure smooth deployment processes.Monitor and troubleshoot issues in production environments.RequirementsTechnical Skills:Minimum of 5 years experience in mobile development.Expert-level experience with React Native CLI and Expo.Proficiency in JavaScript/TypeScript and modern front-end workflows.Experience with mobile app optimization for performance and responsiveness.Experience with RESTful APIs, GraphQL, and database systems (e.g., PostgreSQL, MongoDB).Other Requirements:Proven track record of delivering high-quality, scalable applications.Excellent problem-solving and debugging skills.Strong written and verbal communication skills to work effectively across time zones.Ability to manage competing priorities and deliver on deadlines.Nice-to-HavesFamiliarity with performance monitoring tools like Sentry, New Relic, or similar.Experience working in startup environments.GolangKnowledge of mobile-specific challenges such as battery optimization and push notifications.What We OfferCompetitive salary and benefits. N300k - N500KFlexible working hours and a fully remote environment.Opportunity to shape the future of a fast-growing app with a meaningful mission.A supportive and collaborative team that values innovation and growth.Ready to Join Us?If you’re excited about building impactful technology that shapes consumer experiences, we’d love to hear from you! Apply now and become part of Maoni App’s journey.",
+        "seniorityLevel": "Mid-Senior level",
+        "employmentType": "Full-time",
+        "jobFunction": "Engineering and Information Technology",
+        "industries": "Technology, Information and Internet",
+        "inputUrl": "https://www.linkedin.com/jobs/search/?distance=25&geoId=105365761&keywords=golang",
+        "companyDescription": "Njia Hub is private equity consulting firm based in Lagos, Nigeria",
+        "companySlogan": "A Digital Marketing Software Company"
+    },
+    {
+        "id": "4167264839",
+        "trackingId": "D+cc9NcuCHy3p4F6w1PsdQ==",
+        "refId": "T0Ld7/hw2k/AZQxQjej1lw==",
+        "link": "https://ng.linkedin.com/jobs/view/staff-engineer-at-canonical-4167264839?refId=T0Ld7%2Fhw2k%2FAZQxQjej1lw%3D%3D&trackingId=D%2Bcc9NcuCHy3p4F6w1PsdQ%3D%3D&position=23&pageNum=0",
+        "title": "Staff Engineer",
+        "companyName": "Canonical",
+        "companyLinkedinUrl": "https://uk.linkedin.com/company/canonical?trk=public_jobs_jserp-result_job-search-card-subtitle",
+        "companyLogo": "https://media.licdn.com/dms/image/v2/C560BAQEbIYAkAURcYw/company-logo_100_100/company-logo_100_100/0/1650566107463/canonical_logo?e=2147483647&v=beta&t=17jhZvUOD-0vAJw3nIGnkBiYtBbXfEriIhIo6TfDmzc",
+        "location": "Lagos, Lagos State, Nigeria",
+        "salaryInfo": [
+            ""
+        ],
+        "postedAt": "2025-02-24",
+        "benefits": [
+            "Be an early applicant"
+        ],
+        "descriptionHtml": "This is a general track for Staff Engineer or above in any team at Canonical. After the first round of interviews we will establish which teams might be an excellent fit, and progress your application with them.<br><br>Canonical delivers open source to the world across every class of compute. Canonical Ubuntu is the world's favourite Linux for cloud, desktop and IoT. Our engineering teams work on operating systems, programming languages, applications, devices, infrastructure and services. We work in Golang, Python, C, C++, and Rust for system services, and use React and Flutter on the front end.<br><br>In our levelling framework, a Staff Engineer is not only an outstanding software architect and coder, they also demonstrate the leadership qualities needed to work across teams and products, enabling others to create outstanding technologies and communities. A Staff Engineer partners with an Engineering Director, who is also code-capable, and together they take responsibility for product outcomes. We hire based on academic results and proven product execution, and we select those with a passion for open-source software, innovation, and cutting-edge technology. In this role, you will make a significant contribution in Canonical's portfolio through high-quality code, technical leadership, team motivation and direction, exceptional design, and crisp documentation.<br><br>As a Staff Engineer you'll drive the architecture, design and evolution of high-impact open source. Our teams work at every level of the stack. From the kernel and system software at the core of Ubuntu through to major language runtimes and the bleeding-edge of cloud automation and distributed systems, you'll have the opportunity to work on complex but highly rewarding projects. Our teams also build the services which deliver Ubuntu to the world, on cloud, devices, servers and PCs.<br><br>Additionally, this role will give you the opportunity to engage with the broader open-source community. We're looking for individuals who can help build a thriving community, contribute to a broad range of technologies, and ensure seamless software operations at scale.<br><br>Location: we have remote opportunities for Staff Engineers in every time zone.<br><br>What your day will look like<br><br><ul><li>Lead design and architecture of an impactful open source project</li><li>Code in Golang, Rust, Python, C/C++ or Typescript / React</li><li>Collaborate proactively with a globally distributed team</li><li>Mentor, develop and advise colleagues in their career progression </li><li>Display technical leadership in Canonical and our communities </li><li>Debug issues and produce high-quality code to fix them </li><li>Contribute to technical documentation with the aim to make it the best of its kind </li><li>Work from home with global travel twice annually for company events <br><br></li></ul>What we are looking for in you<br><br><ul><li>An exceptional academic track record from both high school and university</li><li>Undergraduate degree in Computer Science or STEM, or a compelling narrative about your alternative path</li><li>Drive and a track record of going above-and-beyond expectations</li><li>Technical leadership as well as team motivation, direction and pace</li><li>Well-organised, self-starting and able to deliver to schedule</li><li>Professional manner interacting with colleagues, partners, and community</li><li>Deep experience with at least one of Go, Rust, Python or C </li><li>Subject matter expertise in your engineering domain</li><li>Conscientiousness and detail orientation, with a focus on performance</li><li>Professional written and spoken English </li><li>Experience with Linux (Debian or Ubuntu preferred) </li><li>Excellent interpersonal skills, curiosity, flexibility, and accountability </li><li>Passion, thoughtfulness, and self-motivation </li><li>Excellent communication and presentation skills </li><li>Result-oriented, with a personal drive to meet commitments </li><li>Ability to travel twice a year, for company events up to two weeks each<br><br></li></ul><strong>Additional Skills That You Might Also Bring<br><br></strong><ul><li>Experience with container technologies such as LXD, Docker and Kubernetes </li><li>Experience with highly concurrent, distributed systems</li><li>Experience with embedded systems </li><li>Performance engineering – from kernel to web – benchmarks, optimisation</li><li>Experience with software security – fuzzing, tabletop threat models, analysis, audit</li><li>Experience build systems and toolchains, including for cross-compilation </li><li>Experience with public clouds or OpenStack </li><li>Experience with Debian/Ubuntu packaging </li><li>Experience with systems programming or scalable web services </li><li>Deep quality and test engineering</li><li>Web or Flutter front-end experience</li><li>REST and gRPC API experience</li><li>SQL and NoSQL data store expertise</li><li>Experience with public clouds or OpenStack</li><li>Experience with Debian/Ubuntu packaging</li><li>Experience with systems programming or scalable web services<br><br></li></ul>What we offer you<br><br>We consider geographical location, experience, and performance in shaping compensation worldwide. We revisit compensation annually (and more often for graduates and associates) to ensure we recognise outstanding performance. In addition to base pay, we offer a performance-driven annual bonus. We provide all team members with additional benefits, which reflect our values and ideals. We balance our programs to meet local needs and ensure fairness globally.<br><br><ul><li>Distributed work environment with twice-yearly team sprints in person</li><li>Personal learning and development budget of USD 2,000 per year</li><li>Annual compensation review</li><li>Recognition rewards</li><li>Annual holiday leave</li><li>Maternity and paternity leave</li><li>Employee Assistance Programme</li><li>Opportunity to travel to new locations to meet colleagues</li><li>Priority Pass, and travel upgrades for long haul company events<br><br></li></ul><strong>About Canonical<br><br></strong>Canonical is a pioneering tech firm at the forefront of the global move to open source. As the company that publishes Ubuntu, one of the most important open source projects and the platform for AI, IoT and the cloud, we are changing the world on a daily basis. We recruit globally and set a very high standard for people joining the company. We expect excellence - in order to succeed, we need to be the best at what we do. Canonical has been a remote-first company since its inception in 2004. Working here is a step into the future, and will challenge you to think differently, work smarter, learn new skills, and raise your game.<br><br>Canonical is an equal opportunity employer<br><br>We are proud to foster a workplace free from discrimination. Diversity of experience, perspectives, and background create a better work environment and better products. Whatever your identity, we will give your application fair consideration.<br><br>",
+        "applicantsCount": "25",
+        "applyUrl": "https://grnh.se/68236f441us",
+        "descriptionText": "This is a general track for Staff Engineer or above in any team at Canonical. After the first round of interviews we will establish which teams might be an excellent fit, and progress your application with them.Canonical delivers open source to the world across every class of compute. Canonical Ubuntu is the world's favourite Linux for cloud, desktop and IoT. Our engineering teams work on operating systems, programming languages, applications, devices, infrastructure and services. We work in Golang, Python, C, C++, and Rust for system services, and use React and Flutter on the front end.In our levelling framework, a Staff Engineer is not only an outstanding software architect and coder, they also demonstrate the leadership qualities needed to work across teams and products, enabling others to create outstanding technologies and communities. A Staff Engineer partners with an Engineering Director, who is also code-capable, and together they take responsibility for product outcomes. We hire based on academic results and proven product execution, and we select those with a passion for open-source software, innovation, and cutting-edge technology. In this role, you will make a significant contribution in Canonical's portfolio through high-quality code, technical leadership, team motivation and direction, exceptional design, and crisp documentation.As a Staff Engineer you'll drive the architecture, design and evolution of high-impact open source. Our teams work at every level of the stack. From the kernel and system software at the core of Ubuntu through to major language runtimes and the bleeding-edge of cloud automation and distributed systems, you'll have the opportunity to work on complex but highly rewarding projects. Our teams also build the services which deliver Ubuntu to the world, on cloud, devices, servers and PCs.Additionally, this role will give you the opportunity to engage with the broader open-source community. We're looking for individuals who can help build a thriving community, contribute to a broad range of technologies, and ensure seamless software operations at scale.Location: we have remote opportunities for Staff Engineers in every time zone.What your day will look likeLead design and architecture of an impactful open source projectCode in Golang, Rust, Python, C/C++ or Typescript / ReactCollaborate proactively with a globally distributed teamMentor, develop and advise colleagues in their career progression Display technical leadership in Canonical and our communities Debug issues and produce high-quality code to fix them Contribute to technical documentation with the aim to make it the best of its kind Work from home with global travel twice annually for company events What we are looking for in youAn exceptional academic track record from both high school and universityUndergraduate degree in Computer Science or STEM, or a compelling narrative about your alternative pathDrive and a track record of going above-and-beyond expectationsTechnical leadership as well as team motivation, direction and paceWell-organised, self-starting and able to deliver to scheduleProfessional manner interacting with colleagues, partners, and communityDeep experience with at least one of Go, Rust, Python or C Subject matter expertise in your engineering domainConscientiousness and detail orientation, with a focus on performanceProfessional written and spoken English Experience with Linux (Debian or Ubuntu preferred) Excellent interpersonal skills, curiosity, flexibility, and accountability Passion, thoughtfulness, and self-motivation Excellent communication and presentation skills Result-oriented, with a personal drive to meet commitments Ability to travel twice a year, for company events up to two weeks eachAdditional Skills That You Might Also BringExperience with container technologies such as LXD, Docker and Kubernetes Experience with highly concurrent, distributed systemsExperience with embedded systems Performance engineering – from kernel to web – benchmarks, optimisationExperience with software security – fuzzing, tabletop threat models, analysis, auditExperience build systems and toolchains, including for cross-compilation Experience with public clouds or OpenStack Experience with Debian/Ubuntu packaging Experience with systems programming or scalable web services Deep quality and test engineeringWeb or Flutter front-end experienceREST and gRPC API experienceSQL and NoSQL data store expertiseExperience with public clouds or OpenStackExperience with Debian/Ubuntu packagingExperience with systems programming or scalable web servicesWhat we offer youWe consider geographical location, experience, and performance in shaping compensation worldwide. We revisit compensation annually (and more often for graduates and associates) to ensure we recognise outstanding performance. In addition to base pay, we offer a performance-driven annual bonus. We provide all team members with additional benefits, which reflect our values and ideals. We balance our programs to meet local needs and ensure fairness globally.Distributed work environment with twice-yearly team sprints in personPersonal learning and development budget of USD 2,000 per yearAnnual compensation reviewRecognition rewardsAnnual holiday leaveMaternity and paternity leaveEmployee Assistance ProgrammeOpportunity to travel to new locations to meet colleaguesPriority Pass, and travel upgrades for long haul company eventsAbout CanonicalCanonical is a pioneering tech firm at the forefront of the global move to open source. As the company that publishes Ubuntu, one of the most important open source projects and the platform for AI, IoT and the cloud, we are changing the world on a daily basis. We recruit globally and set a very high standard for people joining the company. We expect excellence - in order to succeed, we need to be the best at what we do. Canonical has been a remote-first company since its inception in 2004. Working here is a step into the future, and will challenge you to think differently, work smarter, learn new skills, and raise your game.Canonical is an equal opportunity employerWe are proud to foster a workplace free from discrimination. Diversity of experience, perspectives, and background create a better work environment and better products. Whatever your identity, we will give your application fair consideration.",
+        "seniorityLevel": "Mid-Senior level",
+        "employmentType": "Full-time",
+        "jobFunction": "Engineering and Information Technology",
+        "industries": "Technology, Information and Internet",
+        "inputUrl": "https://www.linkedin.com/jobs/search/?distance=25&geoId=105365761&keywords=golang",
+        "companyDescription": "We deliver open source to the world faster,  more securely and more cost effectively than any other company.\n\nWe're also the publishers of Ubuntu, the world’s most popular enterprise Linux from cloud to edge, together with a passionate global community of 200,000+ contributors. \n\nUbuntu means 'humanity to others'​. We chose it because it embodies the generosity at the heart of open source, the new normal for platforms and innovation.\n\nTogether with a community of 200,000, we publish an operating system that runs from the tiny connected devices up to the world's biggest mainframes, the platform that everybody uses on the public cloud, and the workstation experience of the world's most productive developers.\n\nSecure and reliable, elegant and intuitive, and open for innovation - this is the future of open source, which is why we're proud to be the developers of the fastest growing Linux in the world despite already being the most widely deployed.\n\nIf you're interested in a career at Canonical, we are a remote-first company so please apply to any suitable role as skills are valued more than location, despite some having a preferred geographic preference. \n\nwww.canonical.com ",
+        "companyAddress": {
+            "type": "PostalAddress",
+            "streetAddress": "5th Floor BlueFin Building",
+            "addressLocality": "London",
+            "addressRegion": "England",
+            "postalCode": "SE1 0SU",
+            "addressCountry": "GB"
+        },
+        "companyWebsite": "http://www.canonical.com/",
+        "companySlogan": "Enterprise open source, secured and delivered by the publisher of Ubuntu. ",
+        "companyEmployeesCount": 1677
+    }
+]
 
-chnage the ui template to fit hyper ui
 
-instead of saving log erros in sqlite, log them in excel and send via email
 
-htmlCache data for 13 hrs
 
-use hyperui
+//Jsearch
 
-edit this prompt it and use it 3 times in 
+curl --request GET 
+	--url 'https://jsearch.p.rapidapi.com/search?query=golang&page=1&num_pages=1&country=ng&date_posted=all&radius=104&exclude_job_publishers=Canonical%2CCrossover' 
+	--header 'x-rapidapi-host: jsearch.p.rapidapi.com' 
+	--header 'x-rapidapi-key: 6f5710f06bmsh3502c862c4a7385p1e1f0bjsn36bac81fd1d7'
 
-// new
-add company icon to the models and db
- create monorepo for test code base, nextjs base and the go base
+example response
+
+{"status":"OK","request_id":"02e48810-dea3-49e0-9470-e06d01c30eb1","parameters":{"query":"golang","page":1,"num_pages":1,"date_posted":"all","country":"ng","language":"en"},"data":[{"job_id":"rMvp7GsMoHtBQ5hPAAAAAA==","job_title":"Backend Developer (Go)","employer_name":"Skache Integrated Services","employer_logo":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfUT-C7acmBxTPieISyuuVd9xAYskebu8ZbNsV&s=0","employer_website":null,"job_publisher":"Jobberman","job_employment_type":"Full-time","job_employment_types":["FULLTIME"],"job_apply_link":"https://www.jobberman.com/listings/job-title-backend-developer-go-with-banking-app-development-experience-4n95m8?utm_campaign=google_jobs_apply&utm_source=google_jobs_apply&utm_medium=organic","job_apply_is_direct":true,"apply_options":[{"publisher":"Jobberman","apply_link":"https://www.jobberman.com/listings/job-title-backend-developer-go-with-banking-app-development-experience-4n95m8?utm_campaign=google_jobs_apply&utm_source=google_jobs_apply&utm_medium=organic","is_direct":true}],"job_description":"Responsibilities:\n• Design and implement backend services and APIs\nusing Go (Golang).\n• Manage databases to ensure efficient and secure\ndata storage and retrieval.\n• Implement security best practices to protect\nsensitive banking data on the backend.\n• Optimize backend performance for efficient\nprocessing and data handling.\n• Work closely with frontend developers to ensure\nseamless integration between frontend and backend components.\n• Conduct thorough testing and debugging to ensure\nthe reliability and stability of backend services.\n• Maintain clear and comprehensive documentation\nfor the backend code and system architecture.\n\nRequirements:\n• Bachelor’s\ndegree in Computer Science, Information Technology, or a related field.\n• Minimum\nof 3 years of experience in backend development with a focus on Go (Golang).\n• Proven\nexperience in developing banking applications is required.\n• Proficiency in Go (Golang), strong understanding\nof RESTful APIs, database management, and security best practices.\n• Relevant certifications in Go or banking\napplication development are a plus.\n• Meticulous\nattention to detail to ensure the quality and security of backend services.\n• Strong problem-solving skills to address\ntechnical challenges and find effective solutions.\n• Ability to work effectively in a team\nenvironment and collaborate with colleagues across different departments.\n\nOnly shortlisted candidates will be contacted","job_is_remote":false,"job_posted_at":"20 days ago","job_posted_at_timestamp":1740873600,"job_posted_at_datetime_utc":"2025-03-02T00:00:00.000Z","job_location":"Nigeria","job_city":null,"job_state":null,"job_country":"NG","job_latitude":9.081999,"job_longitude":8.675277,"job_benefits":null,"job_google_link":"https://www.google.com/search?q=jobs&gl=ng&hl=en&udm=8#vhid=vt%3D20/docid%3DrMvp7GsMoHtBQ5hPAAAAAA%3D%3D&vssid=jobs-detail-viewer","job_min_salary":null,"job_max_salary":null,"job_salary_period":"MONTH","job_highlights":{},"job_onet_soc":"15113300","job_onet_job_zone":"4"},{"job_id":"n-7kktQ0ACd7EQe6AAAAAA==","job_title":"GoLang Developer at Acronis","employer_name":"Acronis","employer_logo":null,"employer_website":"http://www.acronis.com/","job_publisher":"JobNetworkNigeria","job_employment_type":"Full-time","job_employment_types":["FULLTIME"],"job_apply_link":"https://jobnetworknigeria.com/job/golang-developer-at-acronis/?utm_campaign=google_jobs_apply&utm_source=google_jobs_apply&utm_medium=organic","job_apply_is_direct":true,"apply_options":[{"publisher":"JobNetworkNigeria","apply_link":"https://jobnetworknigeria.com/job/golang-developer-at-acronis/?utm_campaign=google_jobs_apply&utm_source=google_jobs_apply&utm_medium=organic","is_direct":true}],"job_description":"Acronis is revolutionizing cyber protection by unifying backup, disaster recovery, storage, next-generation anti-malware, and protection management into one solution. This all-in-one integration removes the complexity and risks associated with non-integrated solutions and offers easy, complete and reliable data protection for all workloads, applications, and systems across any environment—all at a low and predictable cost.\n\nJob Position: GoLang Developer (Advanced Automation)\n\nJob Location: Abuja, Nigeria\n\nJob Responsibilities\n• Analyse, research and develop functionality to roadmap requirements;\n• Participate in design and peer code reviews.\n• Develop unit tests and planform features;\n• Support QA team in technical matters;\n• Overlook deployments and maintain the code after it’s deployed.\n\nJob Requirements\n• At least 3 years of experience writing well-designed, high-quality production code\n• Solid knowledge and experience with GoLang, JavaScript\n• Experience with databases (MySQL or PostgreSQL)\n• Knowledge of the principles of REST / RESTful\n• Strong knowledge of software implementation best practices\n• Knowledge of MSSQL, stored procedures, and/or C# will be a plus\n• Good interpersonal, written and verbal communication skills\n• Fluent English\n\nHow to Apply\n\nInterested and qualified candidates should:\n\nClick here to apply online\n\nTagged as: Information Technology","job_is_remote":false,"job_posted_at":null,"job_posted_at_timestamp":null,"job_posted_at_datetime_utc":null,"job_location":"Abuja","job_city":"Abuja","job_state":"Federal Capital Territory","job_country":"NG","job_latitude":9.0562646,"job_longitude":7.4985259,"job_benefits":null,"job_google_link":"https://www.google.com/search?q=jobs&gl=ng&hl=en&udm=8#vhid=vt%3D20/docid%3Dn-7kktQ0ACd7EQe6AAAAAA%3D%3D&vssid=jobs-detail-viewer","job_salary":null,"job_min_salary":null,"job_max_salary":null,"job_salary_period":null,"job_highlights":{},"job_onet_soc":"15113200","job_onet_job_zone":"4"},{"job_id":"5vh3wMvTFikPwXFNAAAAAA==","job_title":"Senior Golang Developer (Vendor Portal)+Acronis","employer_name":"Acronis","employer_logo":null,"employer_website":"http://www.acronis.com/","job_publisher":"BetaJob","job_employment_type":"Full-time","job_employment_types":["FULLTIME"],"job_apply_link":"https://betajob.com.ng/senior-golang-developer-vendor-portal-acronis/19533?utm_campaign=google_jobs_apply&utm_source=google_jobs_apply&utm_medium=organic","job_apply_is_direct":true,"apply_options":[{"publisher":"BetaJob","apply_link":"https://betajob.com.ng/senior-golang-developer-vendor-portal-acronis/19533?utm_campaign=google_jobs_apply&utm_source=google_jobs_apply&utm_medium=organic","is_direct":true}],"job_description":"Location: Abuja, Nigeria Job Description We are looking for skilled and motivated Senior Go Developer who, along with our excellent and modern software development team, will be responsible for working on the Vendor Portal product. This is an individual contributor position that will be responsible for the development of backend services in Go. Every member of our “A-Team” has an instrumental role and impact on the success of Acronis’ innovative and growing business, so we are looking for someone who enjoys working in dynamic, global teams and thrives in a fast-paced and rapidly changing work environment. Just like everyone at Acronis, the ideal candidate will embody all of our company values: responsive, alert, detail-oriented, makes decisions, and never gives up. Responsibilites What you'll do: Designing and developing scalable, robust, testable, efficient, and easily maintainable code in Go Owning and maintaining backend components part of a microservice architecture Implementing designs, unit tests, debugging and integrating code, performing code reviews Collaborating with PMs, QA, Architects and other stakeholders Taking part of the whole Software Development Life Cycle Mentoring more junior colleagues and helping them grow professionally. Experience & Qualifications What you bring: 5+ years of experience writing well-designed, high-quality production code in Go, C++ or other compiled languages Experience with scalable applications with microservice architectures Knowledge of software engineering principles: standard algorithms, data structures, multi-threading and concurrency Knowledge of CI/CD systems is a plus Understanding of networking is an advantage Fluent English Application Closing Date Not Specified. How to Apply Interested and qualified candidates should: Click here to apply online","job_is_remote":false,"job_posted_at":null,"job_posted_at_timestamp":null,"job_posted_at_datetime_utc":null,"job_location":"Abuja","job_city":"Abuja","job_state":"Federal Capital Territory","job_country":"NG","job_latitude":9.0562646,"job_longitude":7.4985259,"job_benefits":null,"job_google_link":"https://www.google.com/search?q=jobs&gl=ng&hl=en&udm=8#vhid=vt%3D20/docid%3D5vh3wMvTFikPwXFNAAAAAA%3D%3D&vssid=jobs-detail-viewer","job_salary":null,"job_min_salary":null,"job_max_salary":null,"job_salary_period":null,"job_highlights":{},"job_onet_soc":"15113200","job_onet_job_zone":"4"}]}
+
+
+Linkedin
+
+curl --request GET 
+	--url 'https://linkedin-job-search-api.p.rapidapi.com/active-jb-7d?limit=50&offset=0&title_filter=%22golang%22&location_filter=%22Nigeria%22&organization_slug_filter=%22https%3A%2F%2Fwww.linkedin.com%2Fcompany%2Fcanonical%22' 
+	--header 'x-rapidapi-host: linkedin-job-search-api.p.rapidapi.com' 
+	--header 'x-rapidapi-key: 6f5710f06bmsh3502c862c4a7385p1e1f0bjsn36bac81fd1d7'
+
+example response
+
+[
+  {
+    "id": "1085628554",
+    "date_posted": "2024-11-17T13:38:44",
+    "date_created": "2024-11-17T13:56:19.601391",
+    "title": "Accounts Receivable Specialist",
+    "organization": "The Kinsley Group",
+    "organization_url": "https://www.linkedin.com/company/kinsley-power-systems",
+    "date_validthrough": "2024-12-17T13:35:30",
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "US",
+          "addressLocality": "East Granby",
+          "addressRegion": "CT",
+          "streetAddress": null
+        },
+        "latitude": 41.946735,
+        "longitude": -72.72798
+      }
+    ],
+    "location_type": null,
+    "location_requirements_raw": null,
+    "salary_raw": null,
+    "employment_type": [
+      "FULL_TIME"
+    ],
+    "url": "https://www.linkedin.com/jobs/view/accounts-receivable-specialist-at-the-kinsley-group-4078781594",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/C4E0BAQExN5biwsyljg/company-logo_200_200/company-logo_200_200/0/1630591197659/kinsley_power_systems_logo?e=2147483647&amp;v=beta&amp;t=6sLqwy1n_UdQGl5ovm0IhB-9VmVkYhVDPjW7W1WRARQ",
+    "cities_derived": [
+      "East Granby"
+    ],
+    "regions_derived": [
+      "Connecticut"
+    ],
+    "countries_derived": [
+      "United States"
+    ],
+    "locations_derived": [
+      "East Granby, Connecticut, United States"
+    ],
+    "timezones_derived": [
+      "America/New_York"
+    ],
+    "lats_derived": [
+      41.9424
+    ],
+    "lngs_derived": [
+      -72.741
+    ],
+    "remote_derived": false,
+    "recruiter_name": null,
+    "recruiter_title": null,
+    "recruiter_url": null,
+    "linkedin_org_employees": 153,
+    "linkedin_org_url": "http://www.kinsley-group.com",
+    "linkedin_org_size": "51-200 employees",
+    "linkedin_org_slogan": "Onsite Energy Solutions & Service",
+    "linkedin_org_industry": "Oil and Gas",
+    "linkedin_org_followers": 4844,
+    "linkedin_org_headquarters": "East Granby, CT",
+    "linkedin_org_type": "Privately Held",
+    "linkedin_org_foundeddate": "1964",
+    "linkedin_org_specialties": [
+      "Emergency Standby Generators",
+      "Emergency Generator Rentals",
+      "Service & Parts - All Generator Makes and Models",
+      "Transfer Switches",
+      "Switchgear",
+      "Co-generation Maintenance & Service",
+      "Emergency Repair of all Brands of Power Generation Equipment",
+      "and Preventative Maintenance"
+    ],
+    "linkedin_org_locations": [
+      "14 Connecticut South Dr, East Granby, CT 06026, US",
+      "Albany, NY 12204, US",
+      "Syracuse, NY 13208, US",
+      "Tonawanda, NY 14207, US",
+      "Brewster, NY 10509, US",
+      "47 Runway Rd Suite i, Levittown, PA 19057, US"
+    ],
+    "linkedin_org_description": "In 1964, Kenneth N. Kinsley laid the foundation of Kinsley Power Systems, marking the beginning of a remarkable journey. Over the years, our company has steadily grown and evolved into a trusted provider of emergency backup generators and prime power systems. Today, we proudly serve customers throughout the northeast as The Kinsley Group and are renowned for our integrity and professionalism.\n\nAt Kinsley, our mission is simple: to set the standard for power systems performance and service. We achieve this by focusing on two key pillars: delivering quality products and assembling a team of exceptional professionals. For over 50 years, we have exclusively distributed Kohler Power Systems, a highly respected name in emergency power systems. This partnership allows us to offer the best products and ensure customer satisfaction.\nOur associates are the backbone of our success. They are knowledgeable and dedicated to excellence in their respective fields. Whether it is finding innovative solutions to engineering problems or providing outstanding customer service, our team takes pride in their work and approaches every task with care.\n\nWhen it comes to emergency power products, we are the preferred choice in the Northeast US. From single-phase residential 8.5kW generators to three-phase units up to 4MW with paralleling switchgear, we offer a wide range of high-quality Kohler products and reliable service.\n\nIn addition to Kinsley Power Systems, The Kinsley Group also includes Kinsley Energy Systems. KES specializes in combined heat and power applications across the Northeast. As a U.S. distributor of Tedom CHP systems, KES brings advanced power generation solutions to the market.\nThe Kinsley Group is a company built on expertise, integrity, and commitment. We are here to power success and provide dependable solutions for critical power applications.\n",
+    "linkedin_org_recruitment_agency_derived": false
+  },
+  {
+    "id": "1085624887",
+    "date_posted": "2024-11-17T13:36:42",
+    "date_created": "2024-11-17T13:54:25.588657",
+    "title": "Security Officer - OPEN INTERVIEWS",
+    "organization": "J8 Security, LLC",
+    "organization_url": "https://www.linkedin.com/company/j8-security-llc",
+    "date_validthrough": "2024-12-17T13:36:09",
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "US",
+          "addressLocality": "Richfield",
+          "addressRegion": "OH",
+          "streetAddress": null
+        },
+        "latitude": 41.239666,
+        "longitude": -81.65462
+      }
+    ],
+    "location_type": null,
+    "location_requirements_raw": null,
+    "salary_raw": null,
+    "employment_type": [
+      "FULL_TIME"
+    ],
+    "url": "https://www.linkedin.com/jobs/view/security-officer-open-interviews-at-j8-security-llc-4078782414",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/C560BAQFyXEyhZ66TuA/company-logo_200_200/company-logo_200_200/0/1662662660788?e=2147483647&amp;v=beta&amp;t=2kdhuapPpgSWgs9a5ekXxAX3GRAhmKUdyA2JDs4TVwc",
+    "cities_derived": [
+      "Richfield"
+    ],
+    "regions_derived": [
+      "Ohio"
+    ],
+    "countries_derived": [
+      "United States"
+    ],
+    "locations_derived": [
+      "Richfield, Ohio, United States"
+    ],
+    "timezones_derived": [
+      "America/New_York"
+    ],
+    "lats_derived": [
+      41.2354
+    ],
+    "lngs_derived": [
+      -81.6421
+    ],
+    "remote_derived": false,
+    "recruiter_name": null,
+    "recruiter_title": null,
+    "recruiter_url": null,
+    "linkedin_org_employees": 20,
+    "linkedin_org_url": "J8security.com",
+    "linkedin_org_size": "201-500 employees",
+    "linkedin_org_slogan": "We live here, we work here, our reputation is made here.",
+    "linkedin_org_industry": "Security and Investigations",
+    "linkedin_org_followers": null,
+    "linkedin_org_headquarters": "",
+    "linkedin_org_type": "Privately Held",
+    "linkedin_org_foundeddate": "2020",
+    "linkedin_org_specialties": [
+      ""
+    ],
+    "linkedin_org_locations": [],
+    "linkedin_org_description": "The J8 team recognizes the importance of providing quality responsive services, due to this, our products and services are unmatched by competitors.  J8 Security and its’ sister company, J8 Black & White Services can provide a vast array of experience in security management services, loss prevention, investigations, covert camera surveillance, risk assessments, vulnerability assessment, due diligence, emergency response planning, special security deployments, and much more.  This experience proves extremely useful with our clients and is demonstrated by Kevin’s decades long history with many of our clients. ",
+    "linkedin_org_recruitment_agency_derived": false
+  },
+  {
+    "id": "1085632801",
+    "date_posted": "2024-11-17T13:36:25",
+    "date_created": "2024-11-17T13:58:44.143128",
+    "title": "Licensed Property Manager - Austin, TX",
+    "organization": "PURE Property Management",
+    "organization_url": "https://www.linkedin.com/company/purepropertymanagement",
+    "date_validthrough": "2024-12-17T13:35:49",
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "US",
+          "addressLocality": "Round Rock",
+          "addressRegion": "TX",
+          "streetAddress": null
+        },
+        "latitude": 30.508787,
+        "longitude": -97.67996
+      }
+    ],
+    "location_type": null,
+    "location_requirements_raw": null,
+    "salary_raw": {
+      "@type": "MonetaryAmount",
+      "currency": "USD",
+      "value": {
+        "@type": "QuantitativeValue",
+        "minValue": 60000,
+        "maxValue": 64000,
+        "unitText": "YEAR"
+      }
+    },
+    "employment_type": [
+      "FULL_TIME"
+    ],
+    "url": "https://www.linkedin.com/jobs/view/licensed-property-manager-austin-tx-at-pure-property-management-4078780780",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/D560BAQGBzX52Vsszqg/company-logo_200_200/company-logo_200_200/0/1706908857814/purepropertymanagement_logo?e=2147483647&amp;v=beta&amp;t=UUAGUTIMD2c_v8pYTn_XErARvoxPz0mcXKch1uv4B1o",
+    "cities_derived": [
+      "Round Rock"
+    ],
+    "regions_derived": [
+      "Texas"
+    ],
+    "countries_derived": [
+      "United States"
+    ],
+    "locations_derived": [
+      "Round Rock, Texas, United States"
+    ],
+    "timezones_derived": [
+      "America/Chicago"
+    ],
+    "lats_derived": [
+      30.527
+    ],
+    "lngs_derived": [
+      -97.6642
+    ],
+    "remote_derived": false,
+    "recruiter_name": null,
+    "recruiter_title": null,
+    "recruiter_url": null,
+    "linkedin_org_employees": 233,
+    "linkedin_org_url": "https://purepm.co",
+    "linkedin_org_size": "501-1,000 employees",
+    "linkedin_org_slogan": "Property management. PURE and simple.\n",
+    "linkedin_org_industry": "Real Estate",
+    "linkedin_org_followers": 3250,
+    "linkedin_org_headquarters": "Los Gatos, CA",
+    "linkedin_org_type": "Privately Held",
+    "linkedin_org_foundeddate": "2020",
+    "linkedin_org_specialties": [
+      "property management and proptech"
+    ],
+    "linkedin_org_locations": [
+      "Los Gatos, CA 95032, US"
+    ],
+    "linkedin_org_description": "PURE Property Management is the fastest growing profitable residential property management and technology company in the U.S.\n\nLed by a team of experienced industry professionals and seasoned technology innovators, PURE acquires single-family residential property management companies and invests in their people and processes. \n\nBy deploying technology and providing operational efficiencies, PURE enhances resident and investor experiences.",
+    "linkedin_org_recruitment_agency_derived": false
+  },
+  {
+    "id": "1085602273",
+    "date_posted": "2024-11-17T13:36:09",
+    "date_created": "2024-11-17T13:44:25.176771",
+    "title": "Crane Service Technician",
+    "organization": "American Equipment",
+    "organization_url": "https://www.linkedin.com/company/american-equipment-holdings",
+    "date_validthrough": "2024-12-17T13:35:27",
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "US",
+          "addressLocality": "Suwanee",
+          "addressRegion": "GA",
+          "streetAddress": null
+        },
+        "latitude": 34.057514,
+        "longitude": -84.0666
+      }
+    ],
+    "location_type": null,
+    "location_requirements_raw": null,
+    "salary_raw": null,
+    "employment_type": [
+      "FULL_TIME"
+    ],
+    "url": "https://www.linkedin.com/jobs/view/crane-service-technician-at-american-equipment-4078786131",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/D4E0BAQESrtWaXTUr0Q/company-logo_200_200/company-logo_200_200/0/1719344250248/american_equipment_holdings_logo?e=2147483647&amp;v=beta&amp;t=lp_HTNLHDIiZrWOG8HewhPzKCECxq_V8wgQ9wu39T6g",
+    "cities_derived": [
+      "Suwanee"
+    ],
+    "regions_derived": [
+      "Georgia"
+    ],
+    "countries_derived": [
+      "United States"
+    ],
+    "locations_derived": [
+      "Suwanee, Georgia, United States"
+    ],
+    "timezones_derived": [
+      "America/New_York"
+    ],
+    "lats_derived": [
+      34.0508
+    ],
+    "lngs_derived": [
+      -84.0686
+    ],
+    "remote_derived": false,
+    "recruiter_name": null,
+    "recruiter_title": null,
+    "recruiter_url": null,
+    "linkedin_org_employees": 102,
+    "linkedin_org_url": "https://amquipinc.com/",
+    "linkedin_org_size": "501-1,000 employees",
+    "linkedin_org_slogan": "Helping to lift America",
+    "linkedin_org_industry": "Industrial Machinery Manufacturing",
+    "linkedin_org_followers": 1544,
+    "linkedin_org_headquarters": "South Salt Lake, Utah",
+    "linkedin_org_type": "Privately Held",
+    "linkedin_org_foundeddate": "1969",
+    "linkedin_org_specialties": [
+      ""
+    ],
+    "linkedin_org_locations": [
+      "451 W 3440 S, South Salt Lake, Utah 84115, US"
+    ],
+    "linkedin_org_description": "Full-service overhead crane and industrial crane supplier, builder and servicing company",
+    "linkedin_org_recruitment_agency_derived": false
+  },
+  {
+    "id": "1085634048",
+    "date_posted": "2024-11-17T13:35:59",
+    "date_created": "2024-11-17T13:59:30.304679",
+    "title": "Employee Success Coach",
+    "organization": "Southeast Michigan Community Alliance",
+    "organization_url": "https://www.linkedin.com/company/southeast-michigan-community-alliance",
+    "date_validthrough": "2024-12-17T13:35:26",
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "US",
+          "addressLocality": "Taylor",
+          "addressRegion": "MI",
+          "streetAddress": null
+        },
+        "latitude": 42.226578,
+        "longitude": -83.262634
+      }
+    ],
+    "location_type": null,
+    "location_requirements_raw": null,
+    "salary_raw": null,
+    "employment_type": [
+      "FULL_TIME"
+    ],
+    "url": "https://www.linkedin.com/jobs/view/employee-success-coach-at-southeast-michigan-community-alliance-4078786119",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/C560BAQF4kc2Dm7YkTg/company-logo_200_200/company-logo_200_200/0/1630600491186/southeast_michigan_community_alliance_logo?e=2147483647&amp;v=beta&amp;t=FAMzYFvBbL8O83858JS8CCo35UALa2YV9dXVHq03BIA",
+    "cities_derived": [
+      "Taylor"
+    ],
+    "regions_derived": [
+      "Michigan"
+    ],
+    "countries_derived": [
+      "United States"
+    ],
+    "locations_derived": [
+      "Taylor, Michigan, United States"
+    ],
+    "timezones_derived": [
+      "America/Detroit"
+    ],
+    "lats_derived": [
+      42.226
+    ],
+    "lngs_derived": [
+      -83.2688
+    ],
+    "remote_derived": false,
+    "recruiter_name": null,
+    "recruiter_title": null,
+    "recruiter_url": null,
+    "linkedin_org_employees": 47,
+    "linkedin_org_url": "http://www.semca.org",
+    "linkedin_org_size": "51-200 employees",
+    "linkedin_org_slogan": null,
+    "linkedin_org_industry": "Government Administration",
+    "linkedin_org_followers": 934,
+    "linkedin_org_headquarters": "Taylor, MI",
+    "linkedin_org_type": "Nonprofit",
+    "linkedin_org_foundeddate": "1996",
+    "linkedin_org_specialties": [
+      "Workforce Development",
+      "Wayne County Head Start",
+      "Workforce Training",
+      "Economic Development",
+      "and Workforce Intelligence Network"
+    ],
+    "linkedin_org_locations": [
+      "25363 Eureka Rd., Taylor, MI 48180, US"
+    ],
+    "linkedin_org_description": "Since 1996, the Southeast Michigan Community Alliance (SEMCA) has been a leader in workforce development programs, serving residents and employers in Wayne and Monroe counties (excluding the city of Detroit). SEMCA is the region's Michigan Works! Agency (MWA), with seven Michigan Works Service Centers located in Dearborn, Grosse Pointe, Highland Park, Livonia, Monroe, Southgate, and Wayne. SEMCA is accredited by the Council on Accreditation (COA). To learn more about COA, please visit\nwww.COAnet.org.\n",
+    "linkedin_org_recruitment_agency_derived": false
+  },
+  {
+    "id": "1085558140",
+    "date_posted": "2024-11-17T13:23:32",
+    "date_created": "2024-11-17T13:27:26.249316",
+    "title": "Analytical Chemist - LCMS Analyst",
+    "organization": "Enthalpy Analytical",
+    "organization_url": "https://www.linkedin.com/company/enthalpy-analytical",
+    "date_validthrough": "2024-12-17T13:23:32",
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "US",
+          "addressLocality": "El Dorado Hills",
+          "addressRegion": "CA",
+          "streetAddress": null
+        },
+        "latitude": 38.702484,
+        "longitude": -121.08237
+      }
+    ],
+    "location_type": null,
+    "location_requirements_raw": null,
+    "salary_raw": null,
+    "employment_type": [
+      "FULL_TIME"
+    ],
+    "url": "https://www.linkedin.com/jobs/view/analytical-chemist-lcms-analyst-at-enthalpy-analytical-4076506024",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/D560BAQH3cdFwu-mwZw/company-logo_200_200/company-logo_200_200/0/1683031050419/enthalpy_analytical_logo?e=2147483647&amp;v=beta&amp;t=6LNAuyEJkq7t2YGjaxWKxpAt0jUAJq6Yk0KxDt9bQxM",
+    "cities_derived": [
+      "El Dorado Hills"
+    ],
+    "regions_derived": [
+      "California"
+    ],
+    "countries_derived": [
+      "United States"
+    ],
+    "locations_derived": [
+      "El Dorado Hills, California, United States"
+    ],
+    "timezones_derived": [
+      "America/Los_Angeles"
+    ],
+    "lats_derived": [
+      38.675
+    ],
+    "lngs_derived": [
+      -121.049
+    ],
+    "remote_derived": false,
+    "recruiter_name": null,
+    "recruiter_title": null,
+    "recruiter_url": null,
+    "linkedin_org_employees": 282,
+    "linkedin_org_url": "http://www.enthalpy.com",
+    "linkedin_org_size": "201-500 employees",
+    "linkedin_org_slogan": "Accredited Environmental Laboratories offering Air, Water, Soil, Sediment, Ultratrace, and PFAS Testing. ",
+    "linkedin_org_industry": "Environmental Services",
+    "linkedin_org_followers": 3078,
+    "linkedin_org_headquarters": "North Little Rock, Arkansas",
+    "linkedin_org_type": "Public Company",
+    "linkedin_org_foundeddate": "",
+    "linkedin_org_specialties": [
+      "Environmental Toxicology",
+      "PFAS",
+      "Ultratrace",
+      "Analytical Chemistry",
+      "Soil",
+      "Water & Sediment",
+      "Drinking Water",
+      "Nicotine Containing Products Analysis",
+      "Air Testing",
+      "and Indoor Air"
+    ],
+    "linkedin_org_locations": [
+      "5120 Northshore Drive, North Little Rock, Arkansas 72118, US",
+      "800 Capitola Drive, Suite 1, Durham, North Carolina 27713, US",
+      "2323 5th St, Berkeley, California 94710, US",
+      "929 W Barkley Ave, Orange, California 92868, US",
+      "4340 Vandever Ave, San Diego, California 92120, US",
+      "2714 Exchange Dr, Wilmington, North Carolina 28405, US",
+      "1 Lafayette Rd, Hampton, New Hampshire 03842, US",
+      "1470 E Parham Rd, Richmond, Virginia 23227, US",
+      "931 Seaco Ct, Deer Park, Texas 77536, US",
+      "2625 Denison Drive, Mt. Pleasant, MI 48858, US",
+      "1941 Reymet Rd., Richmond, VA 23237, US",
+      "1104 Windfield Way, El Dorado Hills, California 95762, US",
+      "2525 W Bellfort St, Houston, Texas 77054, US"
+    ],
+    "linkedin_org_description": "Enthalpy Analytical (Enthalpy) is a national network of accredited environmental laboratories designed to provide our clients with responsive turnaround, best-in-class testing support, innovative science, regulatory expertise, and high-quality data. Enthalpy is your single source for comprehensive environmental laboratory testing services. Our team of scientists, industry specialists, project managers, and analysts have decades of experience in supporting the testing needs of the public sector, private industry, and governmental agencies.  We specialize in air quality testing, analytical chemistry, environmental toxicology, ultratrace analysis, and emerging contaminants such as Per- and Polyfluoroalkyl Substances (PFAS).  Enthalpy Analytical is the only laboratory partner you need because we get it right from the start.",
+    "linkedin_org_recruitment_agency_derived": false
+  },
+  {
+    "id": "1085615229",
+    "date_posted": "2024-11-17T13:21:52",
+    "date_created": "2024-11-17T13:48:32.890716",
+    "title": "Sales Leadership Roles",
+    "organization": "People 1st ",
+    "organization_url": "https://www.linkedin.com/company/people1stagency",
+    "date_validthrough": "2024-12-17T13:21:51",
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "US",
+          "addressLocality": "Portland",
+          "addressRegion": "OR",
+          "streetAddress": null
+        },
+        "latitude": 45.512924,
+        "longitude": -122.68592
+      }
+    ],
+    "location_type": "TELECOMMUTE",
+    "location_requirements_raw": [
+      {
+        "@type": "Country",
+        "name": "Portland, Oregon, United States"
+      }
+    ],
+    "salary_raw": null,
+    "employment_type": [
+      "FULL_TIME"
+    ],
+    "url": "https://www.linkedin.com/jobs/view/sales-leadership-roles-at-people-1st-4078776987",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/C560BAQEaBapeo3B-vw/company-logo_200_200/company-logo_200_200/0/1678146265090/people1stagency_logo?e=2147483647&amp;v=beta&amp;t=oNyWzU98XvySJ0SJL0ZuIIFBC3PFv1hk58mo9pK1wgM",
+    "cities_derived": [
+      "Portland"
+    ],
+    "regions_derived": [
+      "Oregon"
+    ],
+    "countries_derived": [
+      "United States"
+    ],
+    "locations_derived": [
+      "Portland, Oregon, United States"
+    ],
+    "timezones_derived": [
+      "America/Los_Angeles"
+    ],
+    "lats_derived": [
+      45.5371
+    ],
+    "lngs_derived": [
+      -122.65
+    ],
+    "remote_derived": true,
+    "recruiter_name": null,
+    "recruiter_title": null,
+    "recruiter_url": null,
+    "linkedin_org_employees": 26,
+    "linkedin_org_url": "https://ourpeople1st.com/",
+    "linkedin_org_size": "201-500 employees",
+    "linkedin_org_slogan": "We stand for Integrity, Passion, Respect, Selflessness, Humility, Purpose, and Love in all areas of life and business",
+    "linkedin_org_industry": "Financial Services",
+    "linkedin_org_followers": null,
+    "linkedin_org_headquarters": "",
+    "linkedin_org_type": "Partnership",
+    "linkedin_org_foundeddate": "",
+    "linkedin_org_specialties": [
+      ""
+    ],
+    "linkedin_org_locations": [],
+    "linkedin_org_description": "Our primary mission at People First Agency is to protect families. Our industry is unique, because our success as a business is a direct result of helping people.\n- Forbes List #25 Happiest Workplaces 2018\n- AIL Agency Of The Year 2017\n- Globe Life Owned\n- People First Since 1951",
+    "linkedin_org_recruitment_agency_derived": false
+  },
+  {
+    "id": "1085631956",
+    "date_posted": "2024-11-17T13:17:21",
+    "date_created": "2024-11-17T13:58:15.605704",
+    "title": "Remote Sales Agent Needed: Earn From Anywhere",
+    "organization": "Joseph and Young",
+    "organization_url": "https://www.linkedin.com/company/joseph-and-young",
+    "date_validthrough": "2024-12-17T13:17:20",
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "US",
+          "addressLocality": "North Las Vegas",
+          "addressRegion": "NV",
+          "streetAddress": null
+        },
+        "latitude": 36.205765,
+        "longitude": -115.119514
+      }
+    ],
+    "location_type": "TELECOMMUTE",
+    "location_requirements_raw": [
+      {
+        "@type": "Country",
+        "name": "North Las Vegas, Nevada, United States"
+      }
+    ],
+    "salary_raw": {
+      "@type": "MonetaryAmount",
+      "currency": "USD",
+      "value": {
+        "@type": "QuantitativeValue",
+        "minValue": 120000,
+        "maxValue": 250000,
+        "unitText": "YEAR"
+      }
+    },
+    "employment_type": [
+      "FULL_TIME"
+    ],
+    "url": "https://www.linkedin.com/jobs/view/remote-sales-agent-needed-earn-from-anywhere-at-joseph-and-young-4078783148",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/D4E0BAQG0TIsMBFSwaA/company-logo_200_200/company-logo_200_200/0/1699832977682?e=2147483647&amp;v=beta&amp;t=21MsnEcTVUaCAKZ5d4QqTJn3ecBU-MH1fxE8LTNiqQE",
+    "cities_derived": [
+      "North Las Vegas"
+    ],
+    "regions_derived": [
+      "Nevada"
+    ],
+    "countries_derived": [
+      "United States"
+    ],
+    "locations_derived": [
+      "North Las Vegas, Nevada, United States"
+    ],
+    "timezones_derived": [
+      "America/Los_Angeles"
+    ],
+    "lats_derived": [
+      36.2883
+    ],
+    "lngs_derived": [
+      -115.0888
+    ],
+    "remote_derived": true,
+    "recruiter_name": null,
+    "recruiter_title": null,
+    "recruiter_url": null,
+    "linkedin_org_employees": 1,
+    "linkedin_org_url": "https://www.josephandyoung.com",
+    "linkedin_org_size": "11-50 employees",
+    "linkedin_org_slogan": "Passionate about helping people? Join Joseph and Young! Remote sales reps transforming lives daily.",
+    "linkedin_org_industry": "Insurance",
+    "linkedin_org_followers": 1588,
+    "linkedin_org_headquarters": "Swannanoa, North Carolina",
+    "linkedin_org_type": "Privately Held",
+    "linkedin_org_foundeddate": "2023",
+    "linkedin_org_specialties": [
+      ""
+    ],
+    "linkedin_org_locations": [
+      "204 Whitson Ave, Swannanoa, North Carolina 28778, US"
+    ],
+    "linkedin_org_description": "\"Welcome to Joseph and Young Financial Services!\n\nAt Joseph and Young, our unwavering commitment is to empower individuals and businesses to navigate the intricate world of financial services and insurance. With extensive industry experience, our expert team specializes in crafting tailored solutions to safeguard your financial future and protect your most valued assets.\n\nOur core mission is to arm clients with the knowledge and tools necessary for making well-informed financial decisions. Whether your needs encompass insurance coverage, retirement planning, investment strategies, or wealth management, our dedicated professionals are here to provide comprehensive guidance throughout your financial journey.\n\nDistinguished by a reputation for transparency, integrity, and an unwavering client-centric ethos, Joseph and Young places your financial objectives at the forefront. We tirelessly customize strategies to harmonize with your unique goals and aspirations.\n\nEmbark on the path to financial triumph and tranquility with us. Stay connected to access industry insights, invaluable financial advice, and the latest developments in insurance and finance.\n\nLet us collaborate in shaping a brighter financial future. Reach out to us for a consultation, and commence the discussion on realizing your financial aspirations today. 🚀 #JosephAndYoungFinancial #FinancialServices #Insurance #WealthManagement #ExpertAdvisors\"",
+    "linkedin_org_recruitment_agency_derived": false
+  },
+  {
+    "id": "1085618797",
+    "date_posted": "2024-11-17T13:16:35",
+    "date_created": "2024-11-17T13:49:57.582532",
+    "title": "Remote Sales Career Opportunity: Work Smarter, Not Harder",
+    "organization": "Kenneth Brown Agency",
+    "organization_url": "https://www.linkedin.com/company/kenneth-brown-agency",
+    "date_validthrough": "2024-12-17T13:16:35",
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "US",
+          "addressLocality": "Milpitas",
+          "addressRegion": "CA",
+          "streetAddress": null
+        },
+        "latitude": 37.43148,
+        "longitude": -121.89144
+      }
+    ],
+    "location_type": "TELECOMMUTE",
+    "location_requirements_raw": [
+      {
+        "@type": "Country",
+        "name": "Milpitas, California, United States"
+      }
+    ],
+    "salary_raw": null,
+    "employment_type": [
+      "FULL_TIME"
+    ],
+    "url": "https://www.linkedin.com/jobs/view/remote-sales-career-opportunity-work-smarter-not-harder-at-kenneth-brown-agency-4078781320",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/D560BAQEe7AS2F9LS4A/company-logo_200_200/company-logo_200_200/0/1704993269639/kenneth_brown_agency_logo?e=2147483647&amp;v=beta&amp;t=beXPnyCFr-uIcoZhMYg8yEU_yChe4DQ0I2MrnzVkprY",
+    "cities_derived": [
+      "Milpitas"
+    ],
+    "regions_derived": [
+      "California"
+    ],
+    "countries_derived": [
+      "United States"
+    ],
+    "locations_derived": [
+      "Milpitas, California, United States"
+    ],
+    "timezones_derived": [
+      "America/Los_Angeles"
+    ],
+    "lats_derived": [
+      37.4336
+    ],
+    "lngs_derived": [
+      -121.8921
+    ],
+    "remote_derived": true,
+    "recruiter_name": null,
+    "recruiter_title": null,
+    "recruiter_url": null,
+    "linkedin_org_employees": null,
+    "linkedin_org_url": "https://kennethbrownagency.com/",
+    "linkedin_org_size": "2-10 employees",
+    "linkedin_org_slogan": "Empowering Tomorrow's Triumphs – Your Sales Partner of Choice",
+    "linkedin_org_industry": "Financial Services",
+    "linkedin_org_followers": 950,
+    "linkedin_org_headquarters": "Phoenix, Arizona",
+    "linkedin_org_type": "Privately Held",
+    "linkedin_org_foundeddate": "2024",
+    "linkedin_org_specialties": [
+      ""
+    ],
+    "linkedin_org_locations": [
+      "101 E Washington St, 7th Floor, Phoenix, Arizona 85004, US"
+    ],
+    "linkedin_org_description": "At Kenneth Brown Agency, we revolutionize the craft of sales by skillfully combining innovation, expertise, and unwavering dedication to support businesses in their pursuit of success. Through an unwavering dedication to our clients and a fervent drive for achieving outcomes, we proudly serve as your reliable ally in the realm of sales. Acknowledging that success hinges on robust relationships, our approach revolves around putting clients at the forefront. We prioritize open communication, transparency, and collaboration as we consider our clients essential partners in the journey. Together, we tackle challenges, commemorate triumphs, and strive towards attaining enduring success.",
+    "linkedin_org_recruitment_agency_derived": false
+  },
+  {
+    "id": "1085569416",
+    "date_posted": "2024-11-17T13:16:27",
+    "date_created": "2024-11-17T13:29:43.312051",
+    "title": "Data Scientist",
+    "organization": "Talentvis",
+    "organization_url": "https://sg.linkedin.com/company/talentvis",
+    "date_validthrough": "2025-02-12T10:09:22",
+    "locations_raw": [
+      {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "SG",
+          "addressLocality": "Singapore",
+          "addressRegion": null,
+          "streetAddress": null
+        },
+        "latitude": 1.2894365,
+        "longitude": 103.84998
+      }
+    ],
+    "location_type": null,
+    "location_requirements_raw": null,
+    "salary_raw": null,
+    "employment_type": [
+      "CONTRACTOR"
+    ],
+    "url": "https://sg.linkedin.com/jobs/view/data-scientist-at-talentvis-4076482143",
+    "source_type": "jobboard",
+    "source": "linkedin",
+    "source_domain": "sg.linkedin.com",
+    "organization_logo": "https://media.licdn.com/dms/image/v2/C4D0BAQGxW--1NqkATg/company-logo_200_200/company-logo_200_200/0/1631341120631?e=2147483647&amp;v=beta&amp;t=l5PR-K9FTn0fmTrjtzl0jeCrbkJTyHYMX26hbdeVYUU",
+    "cities_derived": null,
+    "regions_derived": null,
+    "countries_derived": [
+      "Singapore"
+    ],
+    "locations_derived": [
+      "Singapore"
+    ],
+    "timezones_derived": [
+      "Asia/Singapore"
+    ],
+    "lats_derived": [
+      1.3
+    ],
+    "lngs_derived": [
+      103.8
+    ],
+    "remote_derived": false,
+    "recruiter_name": "Treasa Wong",
+    "recruiter_title": "",
+    "recruiter_url": "https://sg.linkedin.com/in/treasa-wong",
+    "linkedin_org_employees": 390,
+    "linkedin_org_url": "http://www.talentvis.com",
+    "linkedin_org_size": "51-200 employees",
+    "linkedin_org_slogan": "Your Partner for Growth.",
+    "linkedin_org_industry": "Staffing and Recruiting",
+    "linkedin_org_followers": 48600,
+    "linkedin_org_headquarters": "Singapore, Singapore",
+    "linkedin_org_type": "Privately Held",
+    "linkedin_org_foundeddate": "2000",
+    "linkedin_org_specialties": [
+      "Staffing & Recruiting",
+      "Recruitment ",
+      "Logistics & Supply Chain",
+      "Retail and Hospitality",
+      "Information Technology ",
+      "Media & Publishing ",
+      "Banking and Finance",
+      "Healthcare & Life Science",
+      "Oil",
+      "Gas and Chemical",
+      "Property and Construction",
+      "Rail",
+      "Executive Search",
+      "Temporary/ Contract Placement",
+      "Project Manpower Management",
+      "HR Outsourcing Solutions",
+      "Call Centre",
+      "Government ",
+      "Tech/ Startups",
+      "and Engineering"
+    ],
+    "linkedin_org_locations": [
+      "218 Orchard Road, #09-01/02, Orchard Gateway@Emerald, Singapore, Singapore 238851, SG",
+      "Jalan Stesen Sentral, Q Sentral, #29-06, Malaysia, Kuala Lumpur 50470, MY",
+      "Level 23 Penthouse Plaza Marein JL. Jendral Sudirman Kav.76-78, Jakarta , Jakarta 12910, ID",
+      "Units A-C, 25/F., Seabright Plaza,, Hong Kong, No. 9-23 Shell Street North Point, HK",
+      "Level 33, Interchange 21, 399 Sukhumvit Road, North Klongtoey, Wattana, Bangkok, Bangkok, Bangkok 10110, TH"
+    ],
+    "linkedin_org_description": "Talentvis is a leading Recruitment & Executive Search Group with offices growing across Asia Pacific. With our expertise recruiting in over ten industries, Talentvis is a platform that connects you to opportunities that further your career. \r\n\r\nPartnering your Growth \r\n\r\nAt Talentvis, you will find partners rather than mere recruiters. We understand there is no one-size-fits-all approach when it comes to finding success in our careers. That’s why we take a meticulous and consultative approach that matches you with the right opportunities and connections. Being your trusted partner is a responsibility that we take seriously.   \r\n\r\nAdapting for the Future\r\n\r\nAs global and local disruptions create obstacles and conditions for growth, we remain abreast of the latest trends and adapt so that we are always well-placed to advise your going forward. Our key insights, industry analysis and manpower management strategies are services that we are pleased to support you with. \r\n\r\nGrowing Together\r\n\r\nGrowth is an inclusive process and it’s better done together. While our consultants are partnering companies in across Asia Pacific, we are committed to investing in the next generation with our corporate social responsibility programmes. We also strongly believe in developing our people and providing the support they need to reach their potential. We are proud to become a nexus for the people around us.",
+    "linkedin_org_recruitment_agency_derived": true
+  }
+]

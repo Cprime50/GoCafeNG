@@ -30,16 +30,17 @@ type Job struct {
 // JSEARCHResponse represents the response from the JSearch API
 type JSEARCHResponse struct {
 	Data []struct {
+		ID             string    `json:"job_id"`
 		JobTitle       string    `json:"job_title"`
 		EmployerName   string    `json:"employer_name"`
+		CompanyURL     string    `json:"employer_webiste"`
 		JobLocation    string    `json:"job_location"`
 		JobDescription string    `json:"job_description"`
 		JobApplyLink   string    `json:"job_apply_link"`
 		JobSalary      string    `json:"job_salary"`
-		JobPostedAt    time.Time `json:"job_posted_at"`
-		JobType        string    `json:"job_type"`
+		JobPostedAt    time.Time `json:"job_posted_at_datetime_utc"`
+		JobType        string    `json:"job_employment_type"`
 		JobIsRemote    bool      `json:"job_is_remote"`
-		Source         string    `json:"source"`
 	} `json:"data"`
 }
 
@@ -48,25 +49,42 @@ type LinkedInResponse struct {
 	Data []struct {
 		ID           string   `json:"id"`
 		Title        string   `json:"title"`
-		Company      string   `json:"company"`
-		LocationData []string `json:"location_data"`
+		Company      string   `json:"organization"`
+		CompanyURL   string   `json:"organization_url"`
+		LocationData []string `json:"locations_derived"`
+		JobType      []string `json:"employment_type"`
 		URL          string   `json:"url"`
-		PostedDate   string   `json:"posted_date"`
-		IsRemote     bool     `json:"is_remote"`
+		PostedDate   string   `json:"date_posted"`
+		IsRemote     bool     `json:"remote_derived"`
 	} `json:"data"`
 }
 
 // MiscresIndeedResponse represents the response from the Indeed API via Apify
 type MiscresIndeedResponse []struct {
 	ID           string    `json:"id"`
-	PositionName string    `json:"position_name"`
+	PositionName string    `json:"positionName"`
 	Company      string    `json:"company"`
 	Location     string    `json:"location"`
 	Description  string    `json:"description"`
 	URL          string    `json:"url"`
 	Salary       string    `json:"salary"`
 	ScrapedAt    time.Time `json:"scraped_at"`
-	JobType      []string  `json:"job_type"`
+	JobType      []string  `json:"jobType"`
+	PostedAt     time.Time `json:"postingDateParsed"`
 }
 
-
+// Apify LinkediN Response
+type ApifyLinkedInResponse []struct {
+	ID             string    `json:"id"`
+	Title          string    `json:"title"`
+	CompanyName    string    `json:"companyName"`
+	CompanyUrl     string    `json:"companyWebsite"`
+	Location       string    `json:"location"`
+	SalaryInfo     []string  `json:"salaryInfo"`
+	Description    string    `json:"descriptionText"`
+	Link           string    `json:"link"`
+	SeniorityLevel string    `json:"seniorityLevel"`
+	EmploymentType string    `json:"employmentType"`
+	PostedAt       time.Time `json:"postedAt"`
+	ScrapedAt      time.Time `json:"scraped_at"`
+}
