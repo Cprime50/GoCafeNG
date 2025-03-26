@@ -31,7 +31,7 @@ func IsDuplicateJob(ctx context.Context, db *sql.DB, job models.Job) (bool, erro
 
 // IsBlockedCompany checks if the company is in the blocked list
 func IsBlockedCompany(companyName string) bool {
-	blockedCompanies := []string{"canonical"}
+	blockedCompanies := []string{"canonical", "crossover"}
 
 	companyLower := strings.ToLower(companyName)
 	for _, blocked := range blockedCompanies {
@@ -39,6 +39,55 @@ func IsBlockedCompany(companyName string) bool {
 			return true
 		}
 	}
+	return false
+}
+
+// IsGoRelatedJob checks if a job is Go-related by looking for "go" or "golang" in title or description
+func IsGoRelatedJob(job models.Job) bool {
+	title := strings.ToLower(job.Title)
+	description := strings.ToLower(job.Description)
+
+	// Check for "go" as a whole word with different patterns:
+	// - surrounded by spaces: " go "
+	// - at beginning: "go "
+	// - at end: " go"
+	// - with punctuation: "(go)", "[go]", ",go", etc.
+	// - with different capitalization: "Go", "GO"
+
+	// Word boundary patterns to check
+	goPrefixes := []string{" go ", " go,", " go.", " go:", " go;", " go-", " go/", " go)", " go]", " go}", "(go ", "[go ", "{go "}
+	goSuffixes := []string{" go", ",go ", ".go ", ":go ", ";go ", "-go ", "/go ", "(go)", "[go]", "{go}"}
+	goStandalone := []string{"(go)", "[go]", "{go}", " go "}
+
+	// Check for the word "go" with various patterns
+	for _, pattern := range goPrefixes {
+		if strings.Contains(title, pattern) || strings.Contains(description, pattern) {
+			return true
+		}
+	}
+
+	for _, pattern := range goSuffixes {
+		if strings.Contains(title, pattern) || strings.Contains(description, pattern) {
+			return true
+		}
+	}
+
+	for _, pattern := range goStandalone {
+		if strings.Contains(title, pattern) || strings.Contains(description, pattern) {
+			return true
+		}
+	}
+
+	// Special case: if title starts with "go" or ends with "go"
+	if strings.HasPrefix(title, "go ") || strings.HasSuffix(title, " go") {
+		return true
+	}
+
+	// Check for "golang" anywhere in title or description
+	if strings.Contains(title, "golang") || strings.Contains(description, "golang") {
+		return true
+	}
+
 	return false
 }
 
@@ -78,6 +127,13 @@ func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, erro
 	count := 0
 	skippedDuplicates := 0
 	skippedBlockedCompanies := 0
+	skippedNonGoJobs := 0
+	companyDetailsFetched := 0
+
+	// Ensure company details table exists
+	if err := EnsureCompanyDetailsTable(ctx, db); err != nil {
+		log.Printf("Warning: Failed to ensure company details table: %v", err)
+	}
 
 	for _, job := range jobs {
 		// Check for context cancellation
@@ -95,6 +151,13 @@ func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, erro
 			continue
 		}
 
+		// Skip jobs that are not Go-related
+		if !IsGoRelatedJob(job) {
+			log.Printf("Skipping non-Go related job: %s at %s", job.Title, job.Company)
+			skippedNonGoJobs++
+			continue
+		}
+
 		// Check for duplicates
 		isDuplicate, err := IsDuplicateJob(ctx, db, job)
 		if err != nil {
@@ -105,6 +168,18 @@ func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, erro
 				job.Title, job.Company, job.PostedAt.Format("Jan 2006"))
 			skippedDuplicates++
 			continue
+		}
+
+		// This job has passed all filters - fetch company details
+		// We do this after all checks to avoid unnecessary API calls
+		companyDetails, err := GetOrFetchCompanyDetails(ctx, db, job.Company, job.CompanyURL)
+		if err != nil {
+			log.Printf("Warning: Failed to fetch company details for %s: %v", job.Company, err)
+		} else if companyDetails != nil {
+			companyDetailsFetched++
+			// Store company details for later use in API responses
+			// Note: We don't save this to the jobs table, just keep it for reference
+			job.CompanyDetails = companyDetails
 		}
 
 		_, err = stmt.ExecContext(ctx,
@@ -138,8 +213,8 @@ func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, erro
 		return count, err
 	}
 
-	log.Printf("Jobs processed: %d saved, %d duplicates skipped, %d from blocked companies skipped",
-		count, skippedDuplicates, skippedBlockedCompanies)
+	log.Printf("Jobs processed: %d saved, %d duplicates skipped, %d from blocked companies skipped, %d non-Go jobs skipped, %d company details fetched",
+		count, skippedDuplicates, skippedBlockedCompanies, skippedNonGoJobs, companyDetailsFetched)
 
 	return count, nil
 }

@@ -53,14 +53,20 @@ func InitDB(connStr string) (*sql.DB, error) {
 }
 
 // TODO chnage this to be logged in excel instead
-// InitSQLite initializes an in-memory SQLite database for logging
+// InitSQLite initializes a file-based SQLite database for logging
 func InitSQLite() (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", ":memory:")
+	// Use a file-based database instead of in-memory to ensure persistence across connections
+	db, err := sql.Open("sqlite3", "./job_logs.db")
 	if err != nil {
 		return nil, err
 	}
 
-	// Create job_sync_logs table in memory
+	// Ensure connection is valid
+	if err = db.Ping(); err != nil {
+		return nil, err
+	}
+
+	// Create job_sync_logs table in the file database
 	_, err = db.Exec(`
 	CREATE TABLE IF NOT EXISTS job_sync_logs (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -71,26 +77,64 @@ func InitSQLite() (*sql.DB, error) {
 		error_message TEXT
 	)`)
 	if err != nil {
+		log.Printf("Error creating table job_sync_logs: %v", err)
 		return nil, err
 	}
 
+	// Verify table exists
+	var tableName string
+	err = db.QueryRow("SELECT name FROM sqlite_master WHERE type='table' AND name='job_sync_logs'").Scan(&tableName)
+	if err != nil {
+		log.Printf("Table verification failed: %v", err)
+		return nil, err
+	}
+
+	log.Println("SQLite initialized successfully with job_sync_logs table")
 	return db, nil
 }
 
 // LogAPISync logs API sync attempts in SQLite
 func LogAPISync(sqliteDB *sql.DB, apiName string, jobCount int, status string, errorMsg string) {
-	_, err := sqliteDB.Exec(
+	if sqliteDB == nil {
+		log.Println("Error logging API sync: SQLite database connection is nil")
+		return
+	}
+
+	// Verify the table exists before insertion
+	var tableName string
+	err := sqliteDB.QueryRow("SELECT name FROM sqlite_master WHERE type='table' AND name='job_sync_logs'").Scan(&tableName)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Println("Error logging API sync: job_sync_logs table does not exist")
+			// Try to recreate the table
+			_, err = sqliteDB.Exec(`
+			CREATE TABLE IF NOT EXISTS job_sync_logs (
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				api_name TEXT NOT NULL,
+				sync_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+				job_count INTEGER,
+				status TEXT,
+				error_message TEXT
+			)`)
+			if err != nil {
+				log.Println("Error recreating job_sync_logs table:", err)
+				return
+			}
+			log.Println("Recreated job_sync_logs table successfully")
+		} else {
+			log.Println("Error verifying job_sync_logs table:", err)
+			return
+		}
+	}
+
+	// Insert the log
+	_, err = sqliteDB.Exec(
 		"INSERT INTO job_sync_logs (api_name, job_count, status, error_message) VALUES (?, ?, ?, ?)",
 		apiName, jobCount, status, errorMsg,
 	)
 	if err != nil {
-		log.Println("Error logging API sync:", err)
+		log.Println("Error inserting into job_sync_logs:", err)
+	} else {
+		log.Printf("Successfully logged API sync for %s", apiName)
 	}
 }
-
-
-
-
-
-
-

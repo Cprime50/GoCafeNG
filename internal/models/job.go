@@ -6,25 +6,49 @@ import (
 
 // Job represents a job posting
 type Job struct {
-	ID             string    `json:"id"`
-	JobID          string    `json:"job_id"`
-	Title          string    `json:"title"`
-	Company        string    `json:"company"`
-	CompanyURL     string    `json:"company_url"`
-	Country        string    `json:"country"`
-	State          string    `json:"state"`
-	Description    string    `json:"description"`
-	URL            string    `json:"url"`
-	Source         string    `json:"source"`
-	IsRemote       bool      `json:"is_remote"`
-	EmploymentType string    `json:"employment_type"`
-	PostedAt       time.Time `json:"posted_at"`
-	DateGotten     time.Time `json:"date_gotten"`
-	ExpDate        time.Time `json:"exp_date"`
-	Salary         string    `json:"salary"`
-	Location       string    `json:"location"`
-	JobType        string    `json:"job_type"`
-	RawData        string    `json:"raw_data"`
+	ID             string          `json:"id"`
+	JobID          string          `json:"job_id"`
+	Title          string          `json:"title"`
+	Company        string          `json:"company"`
+	CompanyURL     string          `json:"company_url"`
+	Country        string          `json:"country"`
+	State          string          `json:"state"`
+	Description    string          `json:"description"`
+	URL            string          `json:"url"`
+	Source         string          `json:"source"`
+	IsRemote       bool            `json:"is_remote"`
+	EmploymentType string          `json:"employment_type"`
+	PostedAt       time.Time       `json:"posted_at"`
+	DateGotten     time.Time       `json:"date_gotten"`
+	ExpDate        time.Time       `json:"exp_date"`
+	Salary         string          `json:"salary"`
+	Location       string          `json:"location"`
+	JobType        string          `json:"job_type"`
+	RawData        string          `json:"raw_data"`
+	CompanyDetails *CompanyDetails `json:"company_details,omitempty"`
+}
+
+// CompanyDetails represents information about a company from BrandFetch API
+type CompanyDetails struct {
+	ID          string        `json:"id"`
+	CompanyID   string        `json:"company_id"` // Reference to the company name or domain
+	Name        string        `json:"name"`
+	Domain      string        `json:"domain"`
+	Description string        `json:"description"`
+	LogoURL     string        `json:"logo_url"`
+	IconURL     string        `json:"icon_url"`
+	AccentColor string        `json:"accent_color"`
+	Industry    []string      `json:"industry"`
+	Links       []CompanyLink `json:"links"`
+	CreatedAt   time.Time     `json:"created_at"`
+	UpdatedAt   time.Time     `json:"updated_at"`
+	RawData     string        `json:"raw_data,omitempty"`
+}
+
+// CompanyLink represents a social media link for a company
+type CompanyLink struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
 }
 
 // JSEARCHResponse represents the response from the JSearch API
@@ -44,47 +68,119 @@ type JSEARCHResponse struct {
 	} `json:"data"`
 }
 
-// LinkedInResponse represents the response from the LinkedIn API
+// LinkedInResponse represents the response from the LinkedIn API via RapidAPI
 type LinkedInResponse struct {
 	Data []struct {
-		ID           string   `json:"id"`
-		Title        string   `json:"title"`
-		Company      string   `json:"organization"`
-		CompanyURL   string   `json:"organization_url"`
-		LocationData []string `json:"locations_derived"`
-		JobType      []string `json:"employment_type"`
-		URL          string   `json:"url"`
-		PostedDate   string   `json:"date_posted"`
-		IsRemote     bool     `json:"remote_derived"`
+		ID                                  string   `json:"id"`
+		DatePosted                          string   `json:"date_posted"`
+		DateCreated                         string   `json:"date_created"`
+		Title                               string   `json:"title"`
+		Organization                        string   `json:"organization"`
+		OrganizationURL                     string   `json:"organization_url"`
+		DateValidthrough                    string   `json:"date_validthrough"`
+		LocationsRaw                        string   `json:"locations_raw,omitempty"`
+		LocationType                        *string  `json:"location_type"`
+		LocationRequirements                *string  `json:"location_requirements_raw"`
+		SalaryRaw                           *string  `json:"salary_raw"`
+		EmploymentType                      []string `json:"employment_type"`
+		URL                                 string   `json:"url"`
+		SourceType                          string   `json:"source_type"`
+		Source                              string   `json:"source"`
+		SourceDomain                        string   `json:"source_domain"`
+		OrganizationLogo                    string   `json:"organization_logo"`
+		CitiesDerived                       []string `json:"cities_derived"`
+		RegionsDerived                      []string `json:"regions_derived"`
+		CountriesDerived                    []string `json:"countries_derived"`
+		LocationsDerived                    []string `json:"locations_derived"`
+		TimezonesDerived                    []string `json:"timezones_derived"`
+		LatsDerived                         []string `json:"lats_derived"`
+		LngsDerived                         []string `json:"lngs_derived"`
+		RemoteDerived                       bool     `json:"remote_derived"`
+		RecruiterName                       *string  `json:"recruiter_name"`
+		RecruiterTitle                      *string  `json:"recruiter_title"`
+		RecruiterURL                        *string  `json:"recruiter_url"`
+		LinkedinOrgEmployees                int      `json:"linkedin_org_employees"`
+		LinkedinOrgURL                      string   `json:"linkedin_org_url"`
+		LinkedinOrgSize                     string   `json:"linkedin_org_size"`
+		LinkedinOrgSlogan                   string   `json:"linkedin_org_slogan"`
+		LinkedinOrgIndustry                 string   `json:"linkedin_org_industry"`
+		LinkedinOrgFollowers                int      `json:"linkedin_org_followers"`
+		LinkedinOrgHeadquarters             string   `json:"linkedin_org_headquarters"`
+		LinkedinOrgType                     string   `json:"linkedin_org_type"`
+		LinkedinOrgFoundeddate              string   `json:"linkedin_org_foundeddate"`
+		LinkedinOrgSpecialties              []string `json:"linkedin_org_specialties"`
+		LinkedinOrgLocations                []string `json:"linkedin_org_locations"`
+		LinkedinOrgDescription              string   `json:"linkedin_org_description"`
+		LinkedinOrgRecruitmentAgencyDerived bool     `json:"linkedin_org_recruitment_agency_derived"`
 	} `json:"data"`
 }
 
 // MiscresIndeedResponse represents the response from the Indeed API via Apify
 type MiscresIndeedResponse []struct {
-	ID           string    `json:"id"`
-	PositionName string    `json:"positionName"`
-	Company      string    `json:"company"`
-	Location     string    `json:"location"`
-	Description  string    `json:"description"`
-	URL          string    `json:"url"`
-	Salary       string    `json:"salary"`
-	ScrapedAt    time.Time `json:"scraped_at"`
-	JobType      []string  `json:"jobType"`
-	PostedAt     time.Time `json:"postingDateParsed"`
+	Salary            string   `json:"salary"`
+	PostedAt          string   `json:"postedAt"`
+	ExternalApplyLink *string  `json:"externalApplyLink"`
+	PositionName      string   `json:"positionName"`
+	JobType           []string `json:"jobType"`
+	Company           string   `json:"company"`
+	Location          string   `json:"location"`
+	Rating            float64  `json:"rating"`
+	ReviewsCount      int      `json:"reviewsCount"`
+	URLInput          *string  `json:"urlInput"`
+	URL               string   `json:"url"`
+	ID                string   `json:"id"`
+	ScrapedAt         string   `json:"scrapedAt"`
+	PostingDateParsed string   `json:"postingDateParsed"`
+	Description       string   `json:"description"`
+	DescriptionHTML   string   `json:"descriptionHTML,omitempty"`
+	SearchInput       struct {
+		Position string `json:"position"`
+		Country  string `json:"country"`
+	} `json:"searchInput"`
+	IsExpired   bool `json:"isExpired"`
+	CompanyInfo struct {
+		IndeedURL          string   `json:"indeedUrl"`
+		URL                *string  `json:"url"`
+		CompanyDescription *string  `json:"companyDescription"`
+		Rating             *float64 `json:"rating"`
+		ReviewCount        *int     `json:"reviewCount"`
+		CompanyLogo        *string  `json:"companyLogo"`
+	} `json:"companyInfo"`
 }
 
-// Apify LinkediN Response
+// ApifyLinkedInResponse represents the response from the LinkedIn API via Apify
 type ApifyLinkedInResponse []struct {
-	ID             string    `json:"id"`
-	Title          string    `json:"title"`
-	CompanyName    string    `json:"companyName"`
-	CompanyUrl     string    `json:"companyWebsite"`
-	Location       string    `json:"location"`
-	SalaryInfo     []string  `json:"salaryInfo"`
-	Description    string    `json:"descriptionText"`
-	Link           string    `json:"link"`
-	SeniorityLevel string    `json:"seniorityLevel"`
-	EmploymentType string    `json:"employmentType"`
-	PostedAt       time.Time `json:"postedAt"`
-	ScrapedAt      time.Time `json:"scraped_at"`
+	ID                 string   `json:"id"`
+	TrackingID         string   `json:"trackingId"`
+	RefID              string   `json:"refId"`
+	Link               string   `json:"link"`
+	Title              string   `json:"title"`
+	CompanyName        string   `json:"companyName"`
+	CompanyLinkedinUrl string   `json:"companyLinkedinUrl"`
+	CompanyLogo        string   `json:"companyLogo"`
+	Location           string   `json:"location"`
+	SalaryInfo         []string `json:"salaryInfo"`
+	PostedAt           string   `json:"postedAt"`
+	Benefits           []string `json:"benefits"`
+	DescriptionHtml    string   `json:"descriptionHtml"`
+	ApplicantsCount    string   `json:"applicantsCount"`
+	ApplyUrl           string   `json:"applyUrl"`
+	DescriptionText    string   `json:"descriptionText"`
+	SeniorityLevel     string   `json:"seniorityLevel"`
+	EmploymentType     string   `json:"employmentType"`
+	JobFunction        string   `json:"jobFunction"`
+	Industries         string   `json:"industries"`
+	InputUrl           string   `json:"inputUrl"`
+	CompanyDescription string   `json:"companyDescription,omitempty"`
+	CompanyAddress     struct {
+		Type            string `json:"type"`
+		StreetAddress   string `json:"streetAddress"`
+		AddressLocality string `json:"addressLocality"`
+		AddressRegion   string `json:"addressRegion"`
+		PostalCode      string `json:"postalCode"`
+		AddressCountry  string `json:"addressCountry"`
+	} `json:"companyAddress,omitempty"`
+	CompanyWebsite        string `json:"companyWebsite,omitempty"`
+	CompanySlogan         string `json:"companySlogan,omitempty"`
+	CompanyEmployeesCount int    `json:"companyEmployeesCount,omitempty"`
 }

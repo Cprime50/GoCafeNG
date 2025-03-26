@@ -36,9 +36,9 @@ trace.out
 # Go module files
 
 # Google OAuth client secret
-client_secret_561335355629-p1gh76iid3ii2irblbgh7bgsqlj7a7ja.apps.googleusercontent.com.json
 client_secret_*.json
 
+*.pem
 
 # Custom files
 issuessolved.txt

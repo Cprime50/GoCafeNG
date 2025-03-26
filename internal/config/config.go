@@ -57,7 +57,7 @@ func LoadConfig() (*Config, error) {
 		config.Mode = "dev"
 	}
 
-	log.Printf("Running in '%s' mode. Using database: %s", config.Mode, config.DBConnStr)
+	log.Printf("Running in '%s' mode.", config.Mode)
 
 	return config, nil
 }

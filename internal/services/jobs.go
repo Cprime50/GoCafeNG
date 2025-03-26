@@ -108,18 +108,18 @@ func StartJobScheduler(postgresDB *sql.DB, sqliteDB *sql.DB, jobFetcher *fetcher
 
 	// // Schedule JSearch jobs
 	scheduler.Every(12).Hours().StartAt(time.Now().Add(12*time.Hour)).Do(FetchAndSaveJSearch, jobFetcher, postgresDB, sqliteDB)
-	//scheduler.Every(1).Minute().StartAt(time.Now().Add(1* time.Minute)).Do(FetchAndSaveJSearch, jobFetcher, postgresDB, sqliteDB)
+	//scheduler.Every(3).Minute().StartAt(time.Now().Add(1* time.Minute)).Do(FetchAndSaveJSearch, jobFetcher, postgresDB, sqliteDB)
 
 	// // Schedule Indeed jobs
-	// scheduler.Every(48).Hours()StartAt(time.Now().Add(48* time.Hour)).Do(FetchAndSaveIndeed, jobFetcher, postgresDB, sqliteDB)
-
+	scheduler.Every(48).Hours().StartAt(time.Now().Add(48* time.Hour)).Do(FetchAndSaveIndeed, jobFetcher, postgresDB, sqliteDB)
+	//	scheduler.Every(3).Minute().StartAt(time.Now().Add(1* time.Minute)).Do(FetchAndSaveIndeed, jobFetcher, postgresDB, sqliteDB)
 	// Schedule LinkedIn jobs
 	scheduler.Every(48).Hours().StartAt(time.Now().Add(48*time.Hour)).Do(FetchAndSaveLinkedIn, jobFetcher, postgresDB, sqliteDB)
-	//scheduler.Every(1).Minute().StartAt(time.Now().Add(1* time.Minute)).Do(FetchAndSaveLinkedIn, jobFetcher, postgresDB, sqliteDB)
+	//scheduler.Every(3).Minute().StartAt(time.Now().Add(1* time.Minute)).Do(FetchAndSaveLinkedIn, jobFetcher, postgresDB, sqliteDB)
 
 	// Schedule apifyLinkedIn jobs
 	scheduler.Every(24).Hours().StartAt(time.Now().Add(48*time.Hour)).Do(FetchAndSaveApifyLinkedIn, jobFetcher, postgresDB, sqliteDB)
-
+	//scheduler.Every(3).Minute().StartAt(time.Now().Add(1* time.Minute)).Do(FetchAndSaveApifyLinkedIn, jobFetcher, postgresDB, sqliteDB)
 	// Start the scheduler asynchronously
 	scheduler.StartAsync()
 
