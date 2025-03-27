@@ -32,7 +32,6 @@ func FetchCompanyLogo(companyURL, apiToken string) string {
 	if companyURL == "" {
 		return ""
 	}
-
 	// Extract domain from URL
 	parsedURL, err := url.Parse(companyURL)
 	if err != nil {
@@ -62,10 +61,9 @@ func FetchCompanyLogo(companyURL, apiToken string) string {
 	apiURL := fmt.Sprintf("https://api.brandfetch.io/v2/brands/%s", domain)
 	req, err := http.NewRequest("GET", apiURL, nil)
 	if err != nil {
-		log.Printf("Error creating BrandFetch request for %s: %v", domain, err)
+		log.Printf("Error creating LogoFetch request for %s: %v", domain, err)
 		return ""
 	}
-
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", apiToken))
 
 	// Make the request
@@ -79,20 +77,20 @@ func FetchCompanyLogo(companyURL, apiToken string) string {
 
 	// Check if the request was successful
 	if res.StatusCode != http.StatusOK {
-		log.Printf("BrandFetch API returned non-200 status for %s: %d", domain, res.StatusCode)
+		log.Printf("LogoFetch API returned non-200 status for %s: %d", domain, res.StatusCode)
 		return ""
 	}
 
 	// Read and parse the response
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		log.Printf("Error reading BrandFetch response for %s: %v", domain, err)
+		log.Printf("Error reading LogoFetch response for %s: %v", domain, err)
 		return ""
 	}
 
 	var brandResponse BrandFetchResponse
 	if err := json.Unmarshal(body, &brandResponse); err != nil {
-		log.Printf("Error parsing BrandFetch response for %s: %v", domain, err)
+		log.Printf("Error parsing LogoFetch response for %s: %v", domain, err)
 		return ""
 	}
 
