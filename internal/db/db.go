@@ -27,6 +27,7 @@ func InitDB(connStr string) (*sql.DB, error) {
 		title TEXT NOT NULL,
 		company TEXT NOT NULL,
 		company_url TEXT,
+		company_logo TEXT,
 		country TEXT,
 		state TEXT,
 		description TEXT,

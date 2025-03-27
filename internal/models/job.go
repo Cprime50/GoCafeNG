@@ -6,49 +6,26 @@ import (
 
 // Job represents a job posting
 type Job struct {
-	ID             string          `json:"id"`
-	JobID          string          `json:"job_id"`
-	Title          string          `json:"title"`
-	Company        string          `json:"company"`
-	CompanyURL     string          `json:"company_url"`
-	Country        string          `json:"country"`
-	State          string          `json:"state"`
-	Description    string          `json:"description"`
-	URL            string          `json:"url"`
-	Source         string          `json:"source"`
-	IsRemote       bool            `json:"is_remote"`
-	EmploymentType string          `json:"employment_type"`
-	PostedAt       time.Time       `json:"posted_at"`
-	DateGotten     time.Time       `json:"date_gotten"`
-	ExpDate        time.Time       `json:"exp_date"`
-	Salary         string          `json:"salary"`
-	Location       string          `json:"location"`
-	JobType        string          `json:"job_type"`
-	RawData        string          `json:"raw_data"`
-	CompanyDetails *CompanyDetails `json:"company_details,omitempty"`
-}
-
-// CompanyDetails represents information about a company from BrandFetch API
-type CompanyDetails struct {
-	ID          string        `json:"id"`
-	CompanyID   string        `json:"company_id"` // Reference to the company name or domain
-	Name        string        `json:"name"`
-	Domain      string        `json:"domain"`
-	Description string        `json:"description"`
-	LogoURL     string        `json:"logo_url"`
-	IconURL     string        `json:"icon_url"`
-	AccentColor string        `json:"accent_color"`
-	Industry    []string      `json:"industry"`
-	Links       []CompanyLink `json:"links"`
-	CreatedAt   time.Time     `json:"created_at"`
-	UpdatedAt   time.Time     `json:"updated_at"`
-	RawData     string        `json:"raw_data,omitempty"`
-}
-
-// CompanyLink represents a social media link for a company
-type CompanyLink struct {
-	Name string `json:"name"`
-	URL  string `json:"url"`
+	ID             string    `json:"id"`
+	JobID          string    `json:"job_id"`
+	Title          string    `json:"title"`
+	Company        string    `json:"company"`
+	CompanyURL     string    `json:"company_url"`
+	CompanyLogo    string    `json:"company_logo"`
+	Country        string    `json:"country"`
+	State          string    `json:"state"`
+	Description    string    `json:"description"`
+	URL            string    `json:"url"`
+	Source         string    `json:"source"`
+	IsRemote       bool      `json:"is_remote"`
+	EmploymentType string    `json:"employment_type"`
+	PostedAt       time.Time `json:"posted_at"`
+	DateGotten     time.Time `json:"date_gotten"`
+	ExpDate        time.Time `json:"exp_date"`
+	Salary         string    `json:"salary"`
+	Location       string    `json:"location"`
+	JobType        string    `json:"job_type"`
+	RawData        string    `json:"raw_data"`
 }
 
 // JSEARCHResponse represents the response from the JSearch API
@@ -57,7 +34,8 @@ type JSEARCHResponse struct {
 		ID             string    `json:"job_id"`
 		JobTitle       string    `json:"job_title"`
 		EmployerName   string    `json:"employer_name"`
-		CompanyURL     string    `json:"employer_webiste"`
+		CompanyURL     string    `json:"employer_website"`
+		EmployerLogo   string    `json:"employer_logo"`
 		JobLocation    string    `json:"job_location"`
 		JobDescription string    `json:"job_description"`
 		JobApplyLink   string    `json:"job_apply_link"`

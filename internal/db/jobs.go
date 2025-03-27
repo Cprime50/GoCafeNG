@@ -3,11 +3,108 @@ package db
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"fmt"
+	"io"
 	"log"
+	"net/http"
+	"net/url"
 	"strings"
+	"time"
 
+	"Go9jaJobs/internal/config"
 	"Go9jaJobs/internal/models"
 )
+
+// BrandFetchResponse represents the response from the BrandFetch API
+type BrandFetchResponse struct {
+	Logos []struct {
+		Formats []struct {
+			Src    string `json:"src"`
+			Format string `json:"format"`
+		} `json:"formats"`
+		Type string `json:"type"`
+	} `json:"logos"`
+}
+
+// FetchCompanyLogo fetches a company logo using the BrandFetch API
+func FetchCompanyLogo(companyURL, apiToken string) string {
+	if companyURL == "" {
+		return ""
+	}
+
+	// Extract domain from URL
+	parsedURL, err := url.Parse(companyURL)
+	if err != nil {
+		log.Printf("Error parsing URL %s: %v", companyURL, err)
+		return ""
+	}
+
+	domain := parsedURL.Host
+	if domain == "" {
+		// If URL doesn't have a scheme, try using the path
+		domain = parsedURL.Path
+	}
+
+	// Remove www. prefix if present
+	domain = strings.TrimPrefix(domain, "www.")
+
+	// Remove any path components
+	if idx := strings.Index(domain, "/"); idx != -1 {
+		domain = domain[:idx]
+	}
+
+	if domain == "" {
+		return ""
+	}
+
+	// Create a request to BrandFetch API
+	apiURL := fmt.Sprintf("https://api.brandfetch.io/v2/brands/%s", domain)
+	req, err := http.NewRequest("GET", apiURL, nil)
+	if err != nil {
+		log.Printf("Error creating BrandFetch request for %s: %v", domain, err)
+		return ""
+	}
+
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", apiToken))
+
+	// Make the request
+	client := &http.Client{Timeout: 10 * time.Second}
+	res, err := client.Do(req)
+	if err != nil {
+		log.Printf("Error fetching logo for %s: %v", domain, err)
+		return ""
+	}
+	defer res.Body.Close()
+
+	// Check if the request was successful
+	if res.StatusCode != http.StatusOK {
+		log.Printf("BrandFetch API returned non-200 status for %s: %d", domain, res.StatusCode)
+		return ""
+	}
+
+	// Read and parse the response
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Printf("Error reading BrandFetch response for %s: %v", domain, err)
+		return ""
+	}
+
+	var brandResponse BrandFetchResponse
+	if err := json.Unmarshal(body, &brandResponse); err != nil {
+		log.Printf("Error parsing BrandFetch response for %s: %v", domain, err)
+		return ""
+	}
+
+	// Extract the first logo URL
+	for _, logo := range brandResponse.Logos {
+		if len(logo.Formats) > 0 {
+			return logo.Formats[0].Src
+		}
+	}
+
+	return ""
+}
 
 // IsDuplicateJob checks if a job already exists in the database
 func IsDuplicateJob(ctx context.Context, db *sql.DB, job models.Job) (bool, error) {
@@ -93,6 +190,12 @@ func IsGoRelatedJob(job models.Job) bool {
 
 // SaveJobsToDB saves the jobs to the database with duplicate and blocked company filtering
 func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, error) {
+	// Get config to access BrandFetch API token
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Printf("Warning: Failed to load config for logo fetching: %v", err)
+	}
+
 	// Use context for transaction to support cancelation
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
@@ -100,9 +203,9 @@ func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, erro
 	}
 
 	stmt, err := tx.PrepareContext(ctx, `
-	INSERT INTO jobs (id, job_id, title, company, company_url, location, description, url, salary, 
+	INSERT INTO jobs (id, job_id, title, company, company_url, company_logo, location, description, url, salary, 
 		posted_at, job_type, is_remote, source, raw_data, date_gotten, country, state)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
 	ON CONFLICT (id) DO UPDATE SET
 		title = EXCLUDED.title, 
 		company = EXCLUDED.company,
@@ -115,6 +218,7 @@ func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, erro
 		is_remote = EXCLUDED.is_remote,
 		source = EXCLUDED.source,
 		raw_data = EXCLUDED.raw_data,
+		company_logo = EXCLUDED.company_logo,
 		updated_at = CURRENT_TIMESTAMP
 	`)
 
@@ -128,12 +232,6 @@ func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, erro
 	skippedDuplicates := 0
 	skippedBlockedCompanies := 0
 	skippedNonGoJobs := 0
-	companyDetailsFetched := 0
-
-	// Ensure company details table exists
-	if err := EnsureCompanyDetailsTable(ctx, db); err != nil {
-		log.Printf("Warning: Failed to ensure company details table: %v", err)
-	}
 
 	for _, job := range jobs {
 		// Check for context cancellation
@@ -170,16 +268,12 @@ func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, erro
 			continue
 		}
 
-		// This job has passed all filters - fetch company details
-		// We do this after all checks to avoid unnecessary API calls
-		companyDetails, err := GetOrFetchCompanyDetails(ctx, db, job.Company, job.CompanyURL)
-		if err != nil {
-			log.Printf("Warning: Failed to fetch company details for %s: %v", job.Company, err)
-		} else if companyDetails != nil {
-			companyDetailsFetched++
-			// Store company details for later use in API responses
-			// Note: We don't save this to the jobs table, just keep it for reference
-			job.CompanyDetails = companyDetails
+		// If we have a config and the job doesn't have a logo, try to fetch one
+		if cfg != nil && cfg.BrandFetchAPIKey != "" && job.CompanyLogo == "" && job.CompanyURL != "" {
+			job.CompanyLogo = FetchCompanyLogo(job.CompanyURL, cfg.BrandFetchAPIKey)
+			if job.CompanyLogo != "" {
+				log.Printf("Fetched logo for %s from BrandFetch", job.Company)
+			}
 		}
 
 		_, err = stmt.ExecContext(ctx,
@@ -188,6 +282,7 @@ func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, erro
 			job.Title,
 			job.Company,
 			job.CompanyURL,
+			job.CompanyLogo,
 			job.Location,
 			job.Description,
 			job.URL,
@@ -213,8 +308,8 @@ func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, erro
 		return count, err
 	}
 
-	log.Printf("Jobs processed: %d saved, %d duplicates skipped, %d from blocked companies skipped, %d non-Go jobs skipped, %d company details fetched",
-		count, skippedDuplicates, skippedBlockedCompanies, skippedNonGoJobs, companyDetailsFetched)
+	log.Printf("Jobs processed: %d saved, %d duplicates skipped, %d from blocked companies skipped, %d non-Go jobs skipped",
+		count, skippedDuplicates, skippedBlockedCompanies, skippedNonGoJobs)
 
 	return count, nil
 }

@@ -121,6 +121,7 @@ func (jf *JobFetcher) FetchJSearchJobs(ctx context.Context) ([]models.Job, error
 			Title:       item.JobTitle,
 			Company:     item.EmployerName,
 			CompanyURL:  item.CompanyURL,
+			CompanyLogo: item.EmployerLogo,
 			Location:    item.JobLocation,
 			Description: item.JobDescription,
 			URL:         item.JobApplyLink,
@@ -200,6 +201,12 @@ func (jf *JobFetcher) FetchLinkedInJobs(ctx context.Context) ([]models.Job, erro
 			companyURL, _ := item["organization_url"].(string)
 			url, _ := item["url"].(string)
 
+			// Extract logo if available
+			logo := ""
+			if logoURL, ok := item["organization_logo"].(string); ok {
+				logo = logoURL
+			}
+
 			// Extract description if available
 			description := ""
 			if desc, ok := item["description"].(string); ok {
@@ -213,6 +220,7 @@ func (jf *JobFetcher) FetchLinkedInJobs(ctx context.Context) ([]models.Job, erro
 				Title:       title,
 				Company:     company,
 				CompanyURL:  companyURL,
+				CompanyLogo: logo,
 				URL:         url,
 				Description: description,
 				Location:    "Nigeria", // Default location
@@ -307,6 +315,7 @@ func (jf *JobFetcher) FetchLinkedInJobs(ctx context.Context) ([]models.Job, erro
 			Title:       item.Title,
 			Company:     item.Organization,
 			CompanyURL:  item.OrganizationURL,
+			CompanyLogo: item.OrganizationLogo,
 			JobType:     employmentType,
 			Location:    location,
 			URL:         item.URL,
@@ -415,12 +424,19 @@ func (jf *JobFetcher) FetchIndeedJobs(ctx context.Context) ([]models.Job, error)
 			}
 		}
 
+		// Extract company logo if available
+		var companyLogo string
+		if item.CompanyInfo.CompanyLogo != nil {
+			companyLogo = *item.CompanyInfo.CompanyLogo
+		}
+
 		jobs[i] = models.Job{
 			ID:          uuid.New().String(),
 			JobID:       item.ID,
 			Title:       item.PositionName,
 			Company:     item.Company,
 			Location:    item.Location,
+			CompanyLogo: companyLogo,
 			Description: item.Description,
 			URL:         item.URL,
 			Salary:      item.Salary,
@@ -532,6 +548,7 @@ func (jf *JobFetcher) FetchApifyLinkedInJobs(ctx context.Context) ([]models.Job,
 			Title:       item.Title,
 			Company:     item.CompanyName,
 			CompanyURL:  companyURL,
+			CompanyLogo: item.CompanyLogo,
 			Location:    item.Location,
 			Description: item.DescriptionText,
 			URL:         item.Link,

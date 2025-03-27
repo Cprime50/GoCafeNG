@@ -1,12 +1,10 @@
 package api
 
 import (
-	"Go9jaJobs/internal/db"
 	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -53,10 +51,9 @@ func (h *Handler) StatusCheck(w http.ResponseWriter, r *http.Request) {
 // GetAllJobs returns all jobs from the database
 func (h *Handler) GetAllJobs(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	ctx := r.Context()
 
 	// Query all jobs from the database
-	rows, err := h.DB.QueryContext(ctx, `
+	rows, err := h.DB.Query(`
 		SELECT 
 			id, job_id, title, company, company_url, location, description,
 			url, salary, posted_at, job_type, is_remote, source
@@ -75,23 +72,23 @@ func (h *Handler) GetAllJobs(w http.ResponseWriter, r *http.Request) {
 	var jobs []map[string]interface{}
 	for rows.Next() {
 		var (
-			id              string
-			jobID           string
-			title           string
-			company         string
-			companyURLField sql.NullString
-			location        sql.NullString
-			description     sql.NullString
-			url             sql.NullString
-			salary          sql.NullString
-			postedAt        time.Time
-			jobType         sql.NullString
-			isRemote        bool
-			source          string
+			id          string
+			jobID       string
+			title       string
+			company     string
+			companyURL  sql.NullString
+			location    sql.NullString
+			description sql.NullString
+			url         sql.NullString
+			salary      sql.NullString
+			postedAt    time.Time
+			jobType     sql.NullString
+			isRemote    bool
+			source      string
 		)
 
 		err := rows.Scan(
-			&id, &jobID, &title, &company, &companyURLField, &location, &description,
+			&id, &jobID, &title, &company, &companyURL, &location, &description,
 			&url, &salary, &postedAt, &jobType, &isRemote, &source,
 		)
 
@@ -112,8 +109,8 @@ func (h *Handler) GetAllJobs(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Add nullable fields only if they have values
-		if companyURLField.Valid {
-			job["company_url"] = companyURLField.String
+		if companyURL.Valid {
+			job["company_url"] = companyURL.String
 		}
 		if location.Valid {
 			job["location"] = location.String
@@ -129,47 +126,6 @@ func (h *Handler) GetAllJobs(w http.ResponseWriter, r *http.Request) {
 		}
 		if jobType.Valid {
 			job["job_type"] = jobType.String
-		}
-
-		// Only get company details from the database, don't fetch from API
-		if companyIdentifier := company; companyIdentifier != "" {
-			// Normalize company ID for lookup
-			companyID := strings.ToLower(companyIdentifier)
-
-			// Only check in the database, don't make API calls
-			existing, err := db.GetCompanyDetailsByCompanyID(ctx, h.DB, companyID)
-			if err != nil {
-				log.Printf("Error checking company details: %v", err)
-			} else if existing != nil {
-				// Create a simplified version of company details for the API response
-				job["company_details"] = map[string]interface{}{
-					"name":         existing.Name,
-					"description":  existing.Description,
-					"logo_url":     existing.LogoURL,
-					"icon_url":     existing.IconURL,
-					"accent_color": existing.AccentColor,
-					"domain":       existing.Domain,
-				}
-
-				// Add social links if available
-				if len(existing.Links) > 0 {
-					links := make(map[string]string)
-					for _, link := range existing.Links {
-						links[link.Name] = link.URL
-					}
-					job["company_details"].(map[string]interface{})["links"] = links
-				}
-
-				// Add industry if available
-				if len(existing.Industry) > 0 {
-					job["company_details"].(map[string]interface{})["industry"] = existing.Industry
-				}
-			} else {
-				// Add basic company details if none found in database
-				job["company_details"] = map[string]interface{}{
-					"name": companyIdentifier,
-				}
-			}
 		}
 
 		jobs = append(jobs, job)

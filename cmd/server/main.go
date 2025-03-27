@@ -42,15 +42,6 @@ func main() {
 		log.Fatal("Failed to connect to Postgres:", err)
 	}
 	log.Println("Connected to Postgres successfully")
-
-	// Create company details table
-	err = db.EnsureCompanyDetailsTable(context.Background(), postgresDB)
-	if err != nil {
-		log.Printf("Warning: Failed to create company_details table: %v", err)
-	} else {
-		log.Println("Company details table initialized successfully")
-	}
-
 	defer postgresDB.Close()
 
 	// Create job fetcher

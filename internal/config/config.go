@@ -12,6 +12,7 @@ import (
 type Config struct {
 	RapidAPIKey        string
 	ApifyAPIKey        string
+	BrandFetchAPIKey   string
 	Mode               string
 	PostgresConnection string
 	Port               string
@@ -27,12 +28,13 @@ func LoadConfig() (*Config, error) {
 	}
 
 	config := &Config{
-		RapidAPIKey:    os.Getenv("RAPID_API_KEY"),
-		ApifyAPIKey:    os.Getenv("APIFY_API_KEY"),
-		Mode:           os.Getenv("MODE"),
-		Port:           os.Getenv("PORT"),
-		APIKey:         os.Getenv("API_KEY"),
-		AllowedOrigins: parseAllowedOrigins(os.Getenv("ALLOWED_ORIGINS")),
+		RapidAPIKey:      os.Getenv("RAPID_API_KEY"),
+		ApifyAPIKey:      os.Getenv("APIFY_API_KEY"),
+		BrandFetchAPIKey: os.Getenv("API_TOKEN_LOGO"),
+		Mode:             os.Getenv("MODE"),
+		Port:             os.Getenv("PORT"),
+		APIKey:           os.Getenv("API_KEY"),
+		AllowedOrigins:   parseAllowedOrigins(os.Getenv("ALLOWED_ORIGINS")),
 	}
 
 	if config.Port == "" {
