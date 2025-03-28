@@ -36,7 +36,6 @@ func main() {
 	defer sqliteDB.Close()
 
 	// Connect to PostgreSQL
-
 	postgresDB, err := db.InitDB(config.DBConnStr)
 	if err != nil {
 		log.Fatal("Failed to connect to Postgres:", err)
@@ -74,8 +73,8 @@ func main() {
 		IdleTimeout:  60 * time.Second,
 	}
 
-	// Start job scheduler
-	scheduler := services.StartJobScheduler(postgresDB, sqliteDB, jobFetcher)
+	// Start job scheduler with persistent job schedule info
+	scheduler := services.StartJobScheduler(postgresDB, jobFetcher)
 
 	// Start the server in a goroutine
 	go func() {
@@ -119,7 +118,7 @@ func main() {
 		log.Printf("Server shutdown error: %v", err)
 	}
 
-	// Stop the scheduler
-	scheduler.Stop()
-	log.Println("Scheduler stopped, exiting.")
+	// Stop the scheduler and save next run times
+	services.StopJobScheduler(scheduler, postgresDB)
+	log.Println("Server gracefully shut down, exiting.")
 }

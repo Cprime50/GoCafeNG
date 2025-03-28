@@ -50,6 +50,12 @@ func InitDB(connStr string) (*sql.DB, error) {
 		return nil, err
 	}
 
+	// Initialize the job scheduler persistence table
+	err = InitScheduleTable(db)
+	if err != nil {
+		return nil, err
+	}
+
 	return db, nil
 }
 

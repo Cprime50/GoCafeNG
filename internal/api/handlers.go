@@ -55,7 +55,7 @@ func (h *Handler) GetAllJobs(w http.ResponseWriter, r *http.Request) {
 	// Query all jobs from the database
 	rows, err := h.DB.Query(`
 		SELECT 
-			id, job_id, title, company, company_url, location, description,
+			id, job_id, title, company, company_url, company_logo, location, description,
 			url, salary, posted_at, job_type, is_remote, source
 		FROM jobs
 		ORDER BY posted_at DESC
@@ -77,6 +77,7 @@ func (h *Handler) GetAllJobs(w http.ResponseWriter, r *http.Request) {
 			title       string
 			company     string
 			companyURL  sql.NullString
+			companyLogo sql.NullString
 			location    sql.NullString
 			description sql.NullString
 			url         sql.NullString
@@ -88,7 +89,7 @@ func (h *Handler) GetAllJobs(w http.ResponseWriter, r *http.Request) {
 		)
 
 		err := rows.Scan(
-			&id, &jobID, &title, &company, &companyURL, &location, &description,
+			&id, &jobID, &title, &company, &companyURL, &companyLogo, &location, &description,
 			&url, &salary, &postedAt, &jobType, &isRemote, &source,
 		)
 
@@ -111,6 +112,9 @@ func (h *Handler) GetAllJobs(w http.ResponseWriter, r *http.Request) {
 		// Add nullable fields only if they have values
 		if companyURL.Valid {
 			job["company_url"] = companyURL.String
+		}
+		if companyLogo.Valid {
+			job["company_logo"] = companyLogo.String
 		}
 		if location.Valid {
 			job["location"] = location.String

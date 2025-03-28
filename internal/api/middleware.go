@@ -7,41 +7,21 @@ import (
 	"time"
 
 	"Go9jaJobs/internal/config"
+
+	"github.com/rs/cors"
 )
 
 // CORSMiddleware for CORS handling
 func CORSMiddleware(allowedOrigins []string) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			origin := r.Header.Get("Origin")
-			allowed := false
-			for _, ao := range allowedOrigins {
-				if ao == "*" || origin == ao {
-					allowed = true
-					break
-				}
-			}
-			if allowed && origin != "" {
-				w.Header().Set("Access-Control-Allow-Origin", origin)
-			} else if len(allowedOrigins) > 0 && allowedOrigins[0] != "*" {
-				w.Header().Set("Access-Control-Allow-Origin", allowedOrigins[0])
-			} else {
-				http.Error(w, "CORS Forbidden", http.StatusForbidden)
-				return
-			}
+	c := cors.New(cors.Options{
+		AllowedOrigins:   allowedOrigins, // Set allowed origins
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Content-Type", "Authorization", "X-API-Key", "X-Timestamp", "X-Signature"},
+		MaxAge:           600, // Cache preflight requests for 10 minutes
+	})
 
-			w.Header().Set("Access-Control-Max-Age", "600")
-			w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
-			w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Authorization, X-API-Key, X-Timestamp, X-Signature")
-			w.Header().Set("Access-Control-Allow-Credentials", "true")
-
-			if r.Method == http.MethodOptions {
-				w.WriteHeader(http.StatusOK)
-				return
-			}
-			next.ServeHTTP(w, r)
-		})
-	}
+	return c.Handler
 }
 
 func APIKeyAuthMiddleware(cfg *config.Config) func(http.Handler) http.Handler {
@@ -86,6 +66,5 @@ func SecurityHeadersMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
-
 
 // TODO might add rate limiti later if needed

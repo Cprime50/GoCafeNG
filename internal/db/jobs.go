@@ -311,3 +311,191 @@ func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, erro
 
 	return count, nil
 }
+
+// JobScheduleInfo represents the record for job scheduler persistence
+type JobScheduleInfo struct {
+	ApiName       string    `json:"api_name"`
+	LastRunTime   time.Time `json:"last_run_time"`
+	NextRunTime   time.Time `json:"next_run_time"`
+	IntervalHours int       `json:"interval_hours"`
+	Status        string    `json:"status"`
+	LastRunCount  int       `json:"last_run_count"`
+	LastErrorMsg  string    `json:"last_error_msg"`
+}
+
+// InitScheduleTable creates or updates the job_schedule_info table for scheduler persistence
+func InitScheduleTable(db *sql.DB) error {
+	// Create job_schedule_info table if it doesn't exist
+	_, err := db.Exec(`
+	CREATE TABLE IF NOT EXISTS job_schedule_info (
+		api_name TEXT PRIMARY KEY,
+		last_run_time TIMESTAMP,
+		next_run_time TIMESTAMP,
+		interval_hours INTEGER NOT NULL,
+		status TEXT,
+		last_run_count INTEGER DEFAULT 0,
+		last_error_msg TEXT,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	)`)
+
+	if err != nil {
+		log.Printf("Error creating job_schedule_info table: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+// GetJobScheduleInfo gets the schedule info for a specific API
+func GetJobScheduleInfo(db *sql.DB, apiName string) (*JobScheduleInfo, error) {
+	var scheduleInfo JobScheduleInfo
+	var lastRunTime, nextRunTime sql.NullTime
+
+	query := `
+		SELECT 
+			api_name, last_run_time, next_run_time, interval_hours, 
+			status, last_run_count, last_error_msg
+		FROM job_schedule_info 
+		WHERE api_name = $1
+	`
+
+	err := db.QueryRow(query, apiName).Scan(
+		&scheduleInfo.ApiName,
+		&lastRunTime,
+		&nextRunTime,
+		&scheduleInfo.IntervalHours,
+		&scheduleInfo.Status,
+		&scheduleInfo.LastRunCount,
+		&scheduleInfo.LastErrorMsg,
+	)
+
+	if err == sql.ErrNoRows {
+		// Not found, return nil without error
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Handle nullable time fields
+	if lastRunTime.Valid {
+		scheduleInfo.LastRunTime = lastRunTime.Time
+	}
+
+	if nextRunTime.Valid {
+		scheduleInfo.NextRunTime = nextRunTime.Time
+	}
+
+	return &scheduleInfo, nil
+}
+
+// UpsertJobScheduleInfo updates or inserts schedule info for a specific API
+func UpdatesJobScheduleInfo(db *sql.DB, info JobScheduleInfo) error {
+	query := `
+		INSERT INTO job_schedule_info (
+			api_name, last_run_time, next_run_time, interval_hours, 
+			status, last_run_count, last_error_msg, updated_at
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_TIMESTAMP)
+		ON CONFLICT (api_name) DO UPDATE SET
+			last_run_time = EXCLUDED.last_run_time,
+			next_run_time = EXCLUDED.next_run_time,
+			interval_hours = EXCLUDED.interval_hours,
+			status = EXCLUDED.status,
+			last_run_count = EXCLUDED.last_run_count,
+			last_error_msg = EXCLUDED.last_error_msg,
+			updated_at = CURRENT_TIMESTAMP
+	`
+
+	_, err := db.Exec(
+		query,
+		info.ApiName,
+		info.LastRunTime,
+		info.NextRunTime,
+		info.IntervalHours,
+		info.Status,
+		info.LastRunCount,
+		info.LastErrorMsg,
+	)
+
+	if err != nil {
+		log.Printf("Error upserting job schedule info for %s: %v", info.ApiName, err)
+		return err
+	}
+
+	return nil
+}
+
+// GetAllJobScheduleInfo gets all job schedule info records
+func GetAllJobScheduleInfo(db *sql.DB) ([]JobScheduleInfo, error) {
+	query := `
+		SELECT 
+			api_name, last_run_time, next_run_time, interval_hours, 
+			status, last_run_count, last_error_msg
+		FROM job_schedule_info
+		ORDER BY api_name
+	`
+
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var scheduleInfos []JobScheduleInfo
+
+	for rows.Next() {
+		var info JobScheduleInfo
+		var lastRunTime, nextRunTime sql.NullTime
+
+		err := rows.Scan(
+			&info.ApiName,
+			&lastRunTime,
+			&nextRunTime,
+			&info.IntervalHours,
+			&info.Status,
+			&info.LastRunCount,
+			&info.LastErrorMsg,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		// Handle nullable time fields
+		if lastRunTime.Valid {
+			info.LastRunTime = lastRunTime.Time
+		}
+
+		if nextRunTime.Valid {
+			info.NextRunTime = nextRunTime.Time
+		}
+
+		scheduleInfos = append(scheduleInfos, info)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return scheduleInfos, nil
+}
+
+// LogJobRun updates the job schedule info with run results
+func LogJobRun(db *sql.DB, apiName string, status string, jobCount int, errorMsg string, intervalHours int) error {
+	now := time.Now()
+	nextRun := now.Add(time.Duration(intervalHours) * time.Hour)
+
+	info := JobScheduleInfo{
+		ApiName:       apiName,
+		LastRunTime:   now,
+		NextRunTime:   nextRun,
+		IntervalHours: intervalHours,
+		Status:        status,
+		LastRunCount:  jobCount,
+		LastErrorMsg:  errorMsg,
+	}
+
+	return UpdatesJobScheduleInfo(db, info)
+}

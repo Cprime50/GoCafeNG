@@ -40,6 +40,9 @@ client_secret_*.json
 
 *.pem
 
+# Google OAuth client secret
+google_secret.json
+
 # Custom files
 issuessolved.txt
 prmpt.mg
