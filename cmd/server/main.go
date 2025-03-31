@@ -74,7 +74,8 @@ func main() {
 	}
 
 	// Start job scheduler with persistent job schedule info
-	scheduler := services.StartJobScheduler(postgresDB, jobFetcher)
+	scheduler := services.StartJobScheduler(postgresDB, sqliteDB, jobFetcher)
+
 
 	// Start the server in a goroutine
 	go func() {
@@ -118,7 +119,6 @@ func main() {
 		log.Printf("Server shutdown error: %v", err)
 	}
 
-	// Stop the scheduler and save next run times
-	services.StopJobScheduler(scheduler, postgresDB)
+	scheduler.Stop()
 	log.Println("Server gracefully shut down, exiting.")
 }

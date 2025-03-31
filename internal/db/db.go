@@ -50,16 +50,10 @@ func InitDB(connStr string) (*sql.DB, error) {
 		return nil, err
 	}
 
-	// Initialize the job scheduler persistence table
-	err = InitScheduleTable(db)
-	if err != nil {
-		return nil, err
-	}
-
 	return db, nil
 }
 
-// TODO chnage this to be logged in excel instead
+// TODO chnage this to be logged in excel instead or the postgres
 // InitSQLite initializes a file-based SQLite database for logging
 func InitSQLite() (*sql.DB, error) {
 	// Use a file-based database instead of in-memory to ensure persistence across connections

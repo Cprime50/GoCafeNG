@@ -323,12 +323,6 @@ func handleIndeed(w http.ResponseWriter, r *http.Request) {
 func main() {
 	// Initialize random seed
 
-	// Load configuration
-	config, err := LoadConfig()
-	if err != nil {
-		log.Fatal("Failed to load configuration:", err)
-	}
-
 	// Create router
 	router := mux.NewRouter()
 
@@ -338,11 +332,11 @@ func main() {
 	router.HandleFunc("/apify/acts/hMvNSpz3JnHgl5jkh/runs", handleIndeed).Methods("POST")
 
 	// Start server
-	port := fmt.Sprintf(":%s", config.Port)
-	log.Printf("Starting test job API server on port %s", config.Port)
-	log.Printf("JSearch API: http://localhost:%s/jsearch/search", config.Port)
-	log.Printf("LinkedIn API: http://localhost:%s/linkedin/active-jb-24h", config.Port)
-	log.Printf("Indeed API: http://localhost:%s/apify/indeed/runs", config.Port)
+	port := ":8081"
+	log.Printf("Starting test job API server on port %s", port)
+	log.Printf("JSearch API: http://localhost:%s/jsearch/search", port)
+	log.Printf("LinkedIn API: http://localhost:%s/linkedin/active-jb-24h", port)
+	log.Printf("Indeed API: http://localhost:%s/apify/indeed/runs", port)
 
 	log.Fatal(http.ListenAndServe(port, router))
 }
