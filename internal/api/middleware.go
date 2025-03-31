@@ -11,17 +11,40 @@ import (
 	"github.com/rs/cors"
 )
 
-// CORSMiddleware for CORS handling
+// CORSMiddleware applies CORS settings and blocks unauthorized origins
 func CORSMiddleware(allowedOrigins []string) func(http.Handler) http.Handler {
-	c := cors.New(cors.Options{
-		AllowedOrigins:   allowedOrigins, // Set allowed origins
-		AllowCredentials: true,
-		AllowedMethods:   []string{"GET", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Content-Type", "Authorization", "X-API-Key", "X-Timestamp", "X-Signature"},
-		MaxAge:           600, // Cache preflight requests for 10 minutes
-	})
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			origin := r.Header.Get("Origin")
 
-	return c.Handler
+			// Check if the request origin is in the allowed list
+			allowed := false
+			for _, ao := range allowedOrigins {
+				if ao == "*" || origin == ao {
+					allowed = true
+					break
+				}
+			}
+
+			// If the origin is not allowed, block the request
+			if !allowed {
+				http.Error(w, "CORS Forbidden", http.StatusForbidden)
+				return
+			}
+
+			// Apply CORS settings
+			c := cors.New(cors.Options{
+				AllowedOrigins:   allowedOrigins,
+				AllowCredentials: true,
+				AllowedMethods:   []string{"GET", "OPTIONS"},
+				AllowedHeaders:   []string{"Accept", "Content-Type", "Authorization", "X-API-Key", "X-Timestamp", "X-Signature"},
+				MaxAge:           600, // Cache preflight requests for 10 minutes
+			})
+
+			// Apply CORS middleware and pass request to next handler
+			c.Handler(next).ServeHTTP(w, r)
+		})
+	}
 }
 
 func APIKeyAuthMiddleware(cfg *config.Config) func(http.Handler) http.Handler {
