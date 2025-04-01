@@ -1,27 +1,12 @@
 version: '3'
 
 services:
-  # app:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - db
-  #   env_file:
-  #     - .env
-  #   restart: unless-stopped
-
-  db:
-    image: postgres:14
+  app:
+    build:
+      context: .
+      dockerfile: DockerFile
     ports:
-      - "5432:5432"
+      - "8080:8080"
     env_file:
       - .env
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    # restart: unless-stopped 
-
-volumes:
-  postgres_data:
+    restart: unless-stopped

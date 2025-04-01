@@ -1,6 +1,6 @@
 module Go9jaJobs
 
-go 1.24.0
+go 1.21.0
 
 require (
 	github.com/go-co-op/gocron v1.37.0
