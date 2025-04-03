@@ -19,6 +19,7 @@ type Config struct {
 	DBConnStr          string
 	APIKey             string
 	AllowedOrigins     []string
+	AllowedIPs         string
 }
 
 // LoadConfig loads configuration from environment variables
@@ -35,6 +36,7 @@ func LoadConfig() (*Config, error) {
 		Port:             os.Getenv("PORT"),
 		APIKey:           os.Getenv("API_KEY"),
 		AllowedOrigins:   parseAllowedOrigins(os.Getenv("ALLOWED_ORIGINS")),
+		AllowedIPs:       os.Getenv("ALLOWED_IPS"),
 	}
 
 	if config.Port == "" {

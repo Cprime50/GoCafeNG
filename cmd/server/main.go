@@ -28,13 +28,6 @@ func main() {
 		log.Fatal("API Key must be set in configuration")
 	}
 
-	// Initialize SQLite for logging
-	sqliteDB, err := db.InitSQLite()
-	if err != nil {
-		log.Fatal("Failed to initialize SQLite:", err)
-	}
-	defer sqliteDB.Close()
-
 	// Connect to PostgreSQL
 	postgresDB, err := db.InitDB(config.DBConnStr)
 	if err != nil {
@@ -74,8 +67,7 @@ func main() {
 	}
 
 	// Start job scheduler with persistent job schedule info
-	scheduler := services.StartJobScheduler(postgresDB, sqliteDB, jobFetcher)
-
+	scheduler := services.StartJobScheduler(postgresDB, postgresDB, jobFetcher)
 
 	// Start the server in a goroutine
 	go func() {

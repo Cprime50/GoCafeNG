@@ -1,9 +1,14 @@
 package api
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
 	"crypto/subtle"
+	"encoding/hex"
 	"log"
+	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"Go9jaJobs/internal/config"
@@ -47,6 +52,43 @@ func CORSMiddleware(allowedOrigins []string) func(http.Handler) http.Handler {
 	}
 }
 
+// IPWhitelistMiddleware restricts access to specific IP addresses or ranges
+func IPWhitelistMiddleware(cfg *config.Config) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if cfg.AllowedIPs == "" {
+				// Allow all if no IPs are specified in the .env
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			allowedIPs := strings.Split(cfg.AllowedIPs, ",")
+			clientIP, _, err := net.SplitHostPort(r.RemoteAddr)
+			if err != nil {
+				log.Printf("Failed to parse client IP: %v", err)
+				http.Error(w, "Forbidden", http.StatusForbidden)
+				return
+			}
+
+			allowed := false
+			for _, allowedIP := range allowedIPs {
+				if clientIP == allowedIP {
+					allowed = true
+					break
+				}
+			}
+
+			if !allowed {
+				http.Error(w, "Forbidden", http.StatusForbidden)
+				return
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
+// APIKeyAuthMiddleware with HMAC validation
 func APIKeyAuthMiddleware(cfg *config.Config) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -61,8 +103,33 @@ func APIKeyAuthMiddleware(cfg *config.Config) func(http.Handler) http.Handler {
 				return
 			}
 
-			// If auth passes, log it
-			log.Printf("[AUTH SUCCESS] %s %s from %s - API Key Validated", r.Method, r.URL.Path, r.RemoteAddr)
+			// HMAC Validation
+			timestamp := r.Header.Get("X-Timestamp")
+			signature := r.Header.Get("X-Signature")
+			if timestamp == "" || signature == "" {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			// Validate timestamp (e.g., within 5 minutes)
+			timeInt, err := time.Parse(time.RFC3339, timestamp)
+			if err != nil || time.Since(timeInt) > 5*time.Minute {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			// Generate HMAC
+			mac := hmac.New(sha256.New, []byte(cfg.APIKey))
+			mac.Write([]byte(timestamp))
+			expectedMAC := mac.Sum(nil)
+			expectedSignature := hex.EncodeToString(expectedMAC)
+
+			if subtle.ConstantTimeCompare([]byte(signature), []byte(expectedSignature)) != 1 {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			log.Printf("[AUTH SUCCESS] %s %s from %s - API Key and HMAC Validated", r.Method, r.URL.Path, r.RemoteAddr)
 			next.ServeHTTP(w, r)
 		})
 	}
