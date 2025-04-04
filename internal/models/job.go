@@ -15,6 +15,7 @@ type Job struct {
 	Country        string    `json:"country"`
 	State          string    `json:"state"`
 	Description    string    `json:"description"`
+	DescriptionHTML string    `json:"description_html"`
 	URL            string    `json:"url"`
 	Source         string    `json:"source"`
 	IsRemote       bool      `json:"is_remote"`

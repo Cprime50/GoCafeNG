@@ -103,7 +103,13 @@ func FetchAndSaveApifyLinkedIn(jobFetcher *fetcher.JobFetcher, postgresDB *sql.D
 
 // StartJobScheduler runs job fetching on scheduled intervals using gocron
 func StartJobScheduler(postgresDB *sql.DB, logDB *sql.DB, jobFetcher *fetcher.JobFetcher) *gocron.Scheduler {
-	loc, _ := time.LoadLocation("Africa/Lagos")
+	// Load the timezone, default to UTC if it fails
+	loc, err := time.LoadLocation("Africa/Lagos")
+	if err != nil {
+		log.Printf("Failed to load timezone 'Africa/Lagos': %v. Defaulting to UTC.", err)
+		loc = time.UTC
+	}
+
 	scheduler := gocron.NewScheduler(loc)
 
 	// Schedule JSearch jobs at 8 PM and 9 AM every day
@@ -116,15 +122,13 @@ func StartJobScheduler(postgresDB *sql.DB, logDB *sql.DB, jobFetcher *fetcher.Jo
 
 	// Schedule jobs at 12 PM
 	if _, err := scheduler.Every(1).Day().At("12:00").Do(func() {
-		// Schedule indeed, apifylinkedin and LinkedIn jobs
+		// Schedule Indeed, ApifyLinkedIn, and LinkedIn jobs
 		FetchAndSaveIndeed(jobFetcher, postgresDB, logDB)
-		//FetchAndSaveLinkedIn(jobFetcher, postgresDB, logDB)
 		FetchAndSaveApifyLinkedIn(jobFetcher, postgresDB, logDB)
 	}); err != nil {
 		log.Println("Failed to schedule 12 PM jobs:", err)
 	}
 
 	scheduler.StartAsync()
-
 	return scheduler
 }
