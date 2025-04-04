@@ -1,6 +1,7 @@
 package api
 
 import (
+	"Go9jaJobs/internal/config"
 	"database/sql"
 	"encoding/json"
 	"log"
@@ -22,15 +23,23 @@ func NewHandler(sqlDB *sql.DB) *Handler {
 	}
 }
 
-// SetupRoutes configures the API routes
-func (h *Handler) SetupRoutes() *mux.Router {
+func (h *Handler) SetupRoutes(cfg *config.Config) *mux.Router {
 	r := mux.NewRouter()
 
-	// Simple homepage that serves as the API
-	r.HandleFunc("/api/jobs", h.GetAllJobs).Methods("GET")
+	// Public route - No authentication middleware
+	r.HandleFunc("/status", h.StatusCheck).Methods("GET")
 
-	// A simple status endpoint
-	r.HandleFunc("/api/status", h.StatusCheck).Methods("GET")
+	// Create protected subrouter
+	protected := r.PathPrefix("/api").Subrouter()
+	
+	// Apply middleware chain to the protected subrouter
+	protected.Use(LoggingMiddleware)
+	protected.Use(APIKeyAuthMiddleware(cfg))
+	protected.Use(SecurityHeadersMiddleware)
+	protected.Use(CORSMiddleware(cfg.AllowedOrigins))
+	
+	// Add protected routes to the subrouter with middleware already applied
+	protected.HandleFunc("/jobs", h.GetAllJobs).Methods("GET")
 
 	return r
 }

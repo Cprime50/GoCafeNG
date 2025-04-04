@@ -1,6 +1,7 @@
 package api
 
 import (
+	"Go9jaJobs/internal/config"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -161,32 +162,46 @@ func TestSetupRoutes(t *testing.T) {
 	}
 	defer mockDB.Close()
 
-	handler := NewHandler(mockDB)
-	router := handler.SetupRoutes()
-
-	// Define the routes we expect to exist
-	expectedRoutes := []struct {
-		path   string
-		method string
-	}{
-		{"/api/status", "GET"},
-		{"/api/jobs", "GET"},
+	// Create a test config
+	testCfg := &config.Config{
+		APIKey:         "test-api-key",
+		AllowedOrigins: []string{"*"},
 	}
+
+	// Initialize handler
+	handler := NewHandler(mockDB)
+
+	// Setup router with config
+	router := handler.SetupRoutes(testCfg)
 
 	// Create a test server
 	server := httptest.NewServer(router)
 	defer server.Close()
 
-	// Test each route
+	// Define the routes we expect to exist
+	expectedRoutes := []struct {
+		path        string
+		method      string
+		requireAuth bool
+	}{
+		{"/api/status", "GET", false},
+		{"/api/jobs", "GET", true},
+	}
+
 	for _, route := range expectedRoutes {
 		t.Run(fmt.Sprintf("%s %s", route.method, route.path), func(t *testing.T) {
-			// Create a request
 			req, err := http.NewRequest(route.method, server.URL+route.path, nil)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			// Send the request
+			// Set required headers if route requires auth
+			if route.requireAuth {
+				req.Header.Set("X-API-Key", testCfg.APIKey)
+				req.Header.Set("X-Timestamp", "1234567890")      // Dummy value
+				req.Header.Set("X-Signature", "dummy-signature") // Dummy value
+			}
+
 			client := &http.Client{}
 			resp, err := client.Do(req)
 			if err != nil {
@@ -194,7 +209,7 @@ func TestSetupRoutes(t *testing.T) {
 			}
 			defer resp.Body.Close()
 
-			// We don't care about the actual response for this test, just that the route exists
+			// Assert the route is not returning 404
 			assert.NotEqual(t, http.StatusNotFound, resp.StatusCode)
 		})
 	}

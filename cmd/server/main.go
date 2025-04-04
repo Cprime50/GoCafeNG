@@ -19,17 +19,17 @@ import (
 
 func main() {
 	// Load configuration
-	config, err := config.LoadConfig()
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatal("Failed to load configuration:", err)
 	}
 
-	if config.APIKey == "" {
+	if cfg.APIKey == "" {
 		log.Fatal("API Key must be set in configuration")
 	}
 
 	// Connect to PostgreSQL
-	postgresDB, err := db.InitDB(config.DBConnStr)
+	postgresDB, err := db.InitDB(cfg.DBConnStr)
 	if err != nil {
 		log.Fatal("Failed to connect to Postgres:", err)
 	}
@@ -37,30 +37,24 @@ func main() {
 	defer postgresDB.Close()
 
 	// Create job fetcher
-	jobFetcher := fetcher.NewJobFetcher(config)
+	jobFetcher := fetcher.NewJobFetcher(cfg)
 
 	// Initialize API handlers
 	apiHandler := api.NewHandler(postgresDB)
-	router := apiHandler.SetupRoutes()
 
-	// Apply middleware stack (from innermost to outermost)
-	var httpHandler http.Handler = router
-	httpHandler = api.LoggingMiddleware(httpHandler)
-	httpHandler = api.APIKeyAuthMiddleware(config)(httpHandler)          // Apply API key authentication
-	httpHandler = api.SecurityHeadersMiddleware(httpHandler)             // Apply security headers
-	httpHandler = api.CORSMiddleware(config.AllowedOrigins)(httpHandler) // Apply CORS middleware
+	// Set up routes
+	router := apiHandler.SetupRoutes(cfg) // Use SetupRoutes function
 
 	// Create HTTP server
-	port := config.Port
+	port := cfg.Port
 	if port == "" {
 		port = "8080"
 	}
 
 	serverAddress := ":" + port
 	server := &http.Server{
-		Addr:    serverAddress,
-		Handler: httpHandler,
-		// Add timeouts for security
+		Addr:         serverAddress,
+		Handler:      router,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
 		IdleTimeout:  60 * time.Second,
@@ -71,13 +65,11 @@ func main() {
 
 	// Start the server in a goroutine
 	go func() {
-		// Get the actual address to use for display
 		host := "localhost"
 		if os.Getenv("HOST") != "" {
 			host = os.Getenv("HOST")
 		}
 
-		// Format the URL and display in console
 		url := fmt.Sprintf("http://%s:%s", host, port)
 		log.Printf("======================================================")
 		log.Printf("  Go9jaJobs API is now running at: \033[1;36m%s\033[0m", url)
@@ -88,7 +80,6 @@ func main() {
 		log.Printf("  in all API requests for proper authentication.")
 		log.Printf("======================================================")
 
-		// Start the server
 		log.Printf("Server listening on port %s...", port)
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server error: %v", err)
