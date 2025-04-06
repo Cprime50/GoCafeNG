@@ -22,7 +22,7 @@ jobs:
         echo "::set-output name=signature::$(echo -n \"${{ steps.generate-security-headers.outputs.timestamp }}\" | openssl dgst -sha256 -hmac \"${{ secrets.API_KEY }}\" | awk '{print $2}')"
 
     - name: Make JSearch API Request
-      if: "github.event.schedule == '0 12 * * *' || github.event.schedule == '0 18 * * *'"
+      if: "github.event.schedule == '0 01 * * *' || github.event.schedule == '0 18 * * *'"
       run: |
         curl -X POST https://your-api-url.com/api/jobs/sync?source=jsearch \
           -H "Origin: ${{ secrets.ORIGIN }}" \
