@@ -2,6 +2,7 @@ package api
 
 import (
 	"Go9jaJobs/internal/config"
+	"Go9jaJobs/internal/fetcher"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -33,7 +34,8 @@ func TestStatusCheck(t *testing.T) {
 	db, _ := setupMockDB(t)
 	defer db.Close()
 
-	handler := NewHandler(db)
+	fetcher := fetcher.NewJobFetcher(&config.Config{}) // ✅
+	handler := NewHandler(db, fetcher)
 
 	// Call the handler function directly
 	handler.StatusCheck(rr, req)
@@ -88,8 +90,8 @@ func TestGetAllJobs(t *testing.T) {
 
 	mock.ExpectQuery("^SELECT (.+) FROM jobs ORDER BY posted_at DESC$").WillReturnRows(rows)
 
-	// Create handler and call the function
-	handler := NewHandler(db)
+	fetcher := fetcher.NewJobFetcher(&config.Config{}) // ✅
+	handler := NewHandler(db, fetcher)
 	handler.GetAllJobs(rr, req)
 
 	// Check the status code
@@ -139,12 +141,14 @@ func TestGetAllJobsDBError(t *testing.T) {
 	db, mock := setupMockDB(t)
 	defer db.Close()
 
+	fetcher := fetcher.NewJobFetcher(&config.Config{})
+
 	// Setup mock query to return an error
 	mock.ExpectQuery("^SELECT (.+) FROM jobs ORDER BY posted_at DESC$").
 		WillReturnError(sql.ErrConnDone)
 
 	// Create handler and call the function
-	handler := NewHandler(db)
+	handler := NewHandler(db, fetcher)
 	handler.GetAllJobs(rr, req)
 
 	// Check the status code should be 500 for internal server error
@@ -168,8 +172,8 @@ func TestSetupRoutes(t *testing.T) {
 		AllowedOrigins: []string{"*"},
 	}
 
-	// Initialize handler
-	handler := NewHandler(mockDB)
+	fetcher := fetcher.NewJobFetcher(&config.Config{}) // ✅
+	handler := NewHandler(mockDB, fetcher)
 
 	// Setup router with config
 	router := handler.SetupRoutes(testCfg)

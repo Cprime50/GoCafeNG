@@ -14,7 +14,6 @@ import (
 	"Go9jaJobs/internal/config"
 	"Go9jaJobs/internal/db"
 	"Go9jaJobs/internal/fetcher"
-	"Go9jaJobs/internal/services"
 )
 
 func main() {
@@ -40,7 +39,7 @@ func main() {
 	jobFetcher := fetcher.NewJobFetcher(cfg)
 
 	// Initialize API handlers
-	apiHandler := api.NewHandler(postgresDB)
+	apiHandler := api.NewHandler(postgresDB, jobFetcher)
 
 	// Set up routes
 	router := apiHandler.SetupRoutes(cfg) // Use SetupRoutes function
@@ -61,7 +60,7 @@ func main() {
 	}
 
 	// Start job scheduler with persistent job schedule info
-	scheduler := services.StartJobScheduler(postgresDB, postgresDB, jobFetcher)
+	//scheduler := services.StartJobScheduler(postgresDB, postgresDB, jobFetcher)
 
 	// Start the server in a goroutine
 	go func() {
@@ -73,7 +72,7 @@ func main() {
 		url := fmt.Sprintf("http://%s:%s", host, port)
 		log.Printf("======================================================")
 		log.Printf("  Go9jaJobs API is now running at: \033[1;36m%s\033[0m", url)
-		log.Printf("  Status endpoint: \033[1;36m%s/api/status\033[0m", url)
+		log.Printf("  Status endpoint: \033[1;36m%s/status\033[0m", url)
 		log.Printf("  Jobs endpoint: \033[1;36m%s/api/jobs\033[0m", url)
 		log.Printf("======================================================")
 		log.Printf("  Remember to include X-API-Key, X-Timestamp, and X-Signature headers")
@@ -102,6 +101,6 @@ func main() {
 		log.Printf("Server shutdown error: %v", err)
 	}
 
-	scheduler.Stop()
+	//scheduler.Stop()
 	log.Println("Server gracefully shut down, exiting.")
 }

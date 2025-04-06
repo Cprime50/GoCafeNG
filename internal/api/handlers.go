@@ -2,8 +2,11 @@ package api
 
 import (
 	"Go9jaJobs/internal/config"
+	"Go9jaJobs/internal/fetcher"
+	"Go9jaJobs/internal/services"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -11,18 +14,18 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Handler holds dependencies for API handlers
 type Handler struct {
-	DB *sql.DB
+	DB         *sql.DB
+	JobFetcher *fetcher.JobFetcher
 }
 
 // NewHandler creates a new Handler instance
-func NewHandler(sqlDB *sql.DB) *Handler {
+func NewHandler(DB *sql.DB, jobFetcher *fetcher.JobFetcher) *Handler {
 	return &Handler{
-		DB: sqlDB,
+		DB:         DB,
+		JobFetcher: jobFetcher,
 	}
 }
-
 func (h *Handler) SetupRoutes(cfg *config.Config) *mux.Router {
 	r := mux.NewRouter()
 
@@ -31,15 +34,18 @@ func (h *Handler) SetupRoutes(cfg *config.Config) *mux.Router {
 
 	// Create protected subrouter
 	protected := r.PathPrefix("/api").Subrouter()
-	
+
 	// Apply middleware chain to the protected subrouter
 	protected.Use(LoggingMiddleware)
 	protected.Use(APIKeyAuthMiddleware(cfg))
 	protected.Use(SecurityHeadersMiddleware)
 	protected.Use(CORSMiddleware(cfg.AllowedOrigins))
-	
+
 	// Add protected routes to the subrouter with middleware already applied
 	protected.HandleFunc("/jobs", h.GetAllJobs).Methods("GET")
+
+	// New endpoint for job fetching
+	protected.HandleFunc("/jobs/sync", h.SyncJobs).Methods("POST")
 
 	return r
 }
@@ -54,6 +60,48 @@ func (h *Handler) StatusCheck(w http.ResponseWriter, r *http.Request) {
 		"message":   "API is running",
 	}
 
+	json.NewEncoder(w).Encode(response)
+}
+
+// SyncJobs endpoint for fetching jobs from all sources
+func (h *Handler) SyncJobs(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Get the source from query parameters
+	source := r.URL.Query().Get("source")
+
+	// Allowed sources
+	validSources := map[string]bool{
+		"jsearch":        true,
+		"indeed":         true,
+		"linkedin":       true,
+		"apify_linkedin": true,
+	}
+
+	// If source is provided and not in valid list, return error
+	if source != "" && !validSources[source] {
+		http.Error(w, fmt.Sprintf("Invalid source: %s", source), http.StatusBadRequest)
+		return
+	}
+
+	// Run sync jobs based on source or run all if source is empty
+	if source == "jsearch" {
+		services.FetchAndSaveJSearch(h.JobFetcher, h.DB)
+	}
+	if source == "indeed" {
+		services.FetchAndSaveIndeed(h.JobFetcher, h.DB)
+	}
+	if source == "linkedin" {
+		services.FetchAndSaveLinkedIn(h.JobFetcher, h.DB)
+	}
+	if source == "apify_linkedin" {
+		services.FetchAndSaveApifyLinkedIn(h.JobFetcher, h.DB)
+	}
+
+	response := map[string]interface{}{
+		"success":   true,
+		"timestamp": time.Now().Format(time.RFC3339),
+	}
 	json.NewEncoder(w).Encode(response)
 }
 

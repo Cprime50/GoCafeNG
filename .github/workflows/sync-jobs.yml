@@ -1,0 +1,62 @@
+name: Sync Jobs API Requests
+
+on:
+  schedule:
+    # JSearch will run every day at 12 PM and 6 PM
+    - cron: "0 12 * * *"
+    - cron: "0 18 * * *"
+    # Indeed and Apify LinkedIn will run every day at 12 PM
+    - cron: "0 12 * * *"
+    # LinkedIn will run every 2 days at 12 AM
+    - cron: "0 0 */2 * *"
+
+jobs:
+  sync-jobs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Generate Timestamp and Signature
+      id: generate-security-headers
+      run: |
+        echo "::set-output name=timestamp::$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+        echo "::set-output name=signature::$(echo -n \"${{ steps.generate-security-headers.outputs.timestamp }}\" | openssl dgst -sha256 -hmac \"${{ secrets.API_KEY }}\" | awk '{print $2}')"
+
+    - name: Make JSearch API Request
+      if: "github.event.schedule == '0 12 * * *' || github.event.schedule == '0 18 * * *'"
+      run: |
+        curl -X POST https://your-api-url.com/api/jobs/sync?source=jsearch \
+          -H "Origin: ${{ secrets.ORIGIN }}" \
+          -H "Content-Type: application/json" \
+          -H "X-API-Key: ${{ secrets.API_KEY }}" \
+          -H "X-Timestamp: ${{ steps.generate-security-headers.outputs.timestamp }}" \
+          -H "X-Signature: ${{ steps.generate-security-headers.outputs.signature }}"
+
+    - name: Make Indeed API Request
+      if: "github.event.schedule == '0 12 * * *'"
+      run: |
+        curl -X POST https://your-api-url.com/api/jobs/sync?source=indeed \
+          -H "Origin: ${{ secrets.ORIGIN }}" \
+          -H "Content-Type: application/json" \
+          -H "X-API-Key: ${{ secrets.API_KEY }}" \
+          -H "X-Timestamp: ${{ steps.generate-security-headers.outputs.timestamp }}" \
+          -H "X-Signature: ${{ steps.generate-security-headers.outputs.signature }}"
+
+    - name: Make LinkedIn API Request
+      if: "github.event.schedule == '0 0 */2 * *'"
+      run: |
+        curl -X POST https://your-api-url.com/api/jobs/sync?source=linkedin \
+          -H "Origin: ${{ secrets.ORIGIN }}" \
+          -H "Content-Type: application/json" \
+          -H "X-API-Key: ${{ secrets.API_KEY }}" \
+          -H "X-Timestamp: ${{ steps.generate-security-headers.outputs.timestamp }}" \
+          -H "X-Signature: ${{ steps.generate-security-headers.outputs.signature }}"
+
+    - name: Make Apify LinkedIn API Request
+      if: "github.event.schedule == '0 12 * * *'"
+      run: |
+        curl -X POST https://your-api-url.com/api/jobs/sync?source=apify_linkedin \
+          -H "Origin: ${{ secrets.ORIGIN }}" \
+          -H "Content-Type: application/json" \
+          -H "X-API-Key: ${{ secrets.API_KEY }}" \
+          -H "X-Timestamp: ${{ steps.generate-security-headers.outputs.timestamp }}" \
+          -H "X-Signature: ${{ steps.generate-security-headers.outputs.signature }}"
