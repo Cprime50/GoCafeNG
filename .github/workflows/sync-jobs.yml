@@ -5,69 +5,68 @@ on:
     - cron: "0 12 * * *"
     - cron: "0 18 * * *"
     - cron: "0 0 */2 * *"
+  
+  # Allow manual trigger for testing
+  workflow_dispatch:
 
 jobs:
   sync-jobs:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Generate Timestamp and Signature
         id: generate-security-headers
         run: |
           timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
-          signature=$(echo -n "$timestamp" | openssl dgst -sha256 -hmac "$API_KEY" | awk '{print $2}')
-          echo "timestamp=$timestamp" >> $GITHUB_ENV
-          echo "signature=$signature" >> $GITHUB_ENV
-        env:
-          API_KEY: ${{ secrets.API_KEY }}
-
+          signature=$(echo -n "$timestamp" | openssl dgst -sha256 -hmac "${{ secrets.API_KEY }}" | awk '{print $2}')
+          echo "timestamp=$timestamp" >> $GITHUB_OUTPUT
+          echo "signature=$signature" >> $GITHUB_OUTPUT
+      
       - name: Determine and Trigger Jobs by UTC Hour
         run: |
           hour=$(date -u +"%H")
           day=$(date -u +"%d")
-
+          
           echo "Current UTC hour: $hour"
           echo "Current UTC day: $day"
-
-          if [[ "$hour" == "12" || "$hour" == "6" ]]; then
+          
+          timestamp="${{ steps.generate-security-headers.outputs.timestamp }}"
+          signature="${{ steps.generate-security-headers.outputs.signature }}"
+          
+          if [[ "$hour" == "12" || "$hour" == "18" ]]; then
             echo "Triggering JSearch..."
-            curl -X POST "https://$API_URL/api/jobs/sync?source=jsearch" \
-              -H "Origin: $ORIGIN" \
+            curl -X POST "https://${{ secrets.API_URL }}/api/jobs/sync?source=jsearch" \
+              -H "Origin: ${{ secrets.ORIGIN }}" \
               -H "Content-Type: application/json" \
-              -H "X-API-Key: $API_KEY" \
+              -H "X-API-Key: ${{ secrets.API_KEY }}" \
               -H "X-Timestamp: $timestamp" \
               -H "X-Signature: $signature"
           fi
-
+          
           if [[ "$hour" == "12" ]]; then
-            echo "Triggering Indeed & Apify LinkedIn..."
-            curl -X POST "https://$API_URL/api/jobs/sync?source=indeed" \
-              -H "Origin: $ORIGIN" \
+            echo "Triggering Indeed..."
+            curl -X POST "https://${{ secrets.API_URL }}/api/jobs/sync?source=indeed" \
+              -H "Origin: ${{ secrets.ORIGIN }}" \
               -H "Content-Type: application/json" \
-              -H "X-API-Key: $API_KEY" \
+              -H "X-API-Key: ${{ secrets.API_KEY }}" \
               -H "X-Timestamp: $timestamp" \
               -H "X-Signature: $signature"
-
-            curl -X POST "https://$API_URL/api/jobs/sync?source=apify_linkedin" \
-              -H "Origin: $ORIGIN" \
+            
+            echo "Triggering Apify LinkedIn..."
+            curl -X POST "https://${{ secrets.API_URL }}/api/jobs/sync?source=apify_linkedin" \
+              -H "Origin: ${{ secrets.ORIGIN }}" \
               -H "Content-Type: application/json" \
-              -H "X-API-Key: $API_KEY" \
+              -H "X-API-Key: ${{ secrets.API_KEY }}" \
               -H "X-Timestamp: $timestamp" \
               -H "X-Signature: $signature"
           fi
-
+          
           if (( day % 2 == 0 )) && [[ "$hour" == "00" ]]; then
             echo "Triggering LinkedIn (every 2 days at 00:00 UTC)..."
-            curl -X POST "https://$API_URL/api/jobs/sync?source=linkedin" \
-              -H "Origin: $ORIGIN" \
+            curl -X POST "https://${{ secrets.API_URL }}/api/jobs/sync?source=linkedin" \
+              -H "Origin: ${{ secrets.ORIGIN }}" \
               -H "Content-Type: application/json" \
-              -H "X-API-Key: $API_KEY" \
+              -H "X-API-Key: ${{ secrets.API_KEY }}" \
               -H "X-Timestamp: $timestamp" \
               -H "X-Signature: $signature"
           fi
-        env:
-          API_URL: ${{ secrets.API_URL }}
-          ORIGIN: ${{ secrets.ORIGIN }}
-          API_KEY: ${{ secrets.API_KEY }}
-          timestamp: ${{ env.timestamp }}
-          signature: ${{ env.signature }}
