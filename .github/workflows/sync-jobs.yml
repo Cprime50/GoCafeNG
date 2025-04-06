@@ -2,7 +2,7 @@ name: Sync Jobs API Requests
 
 on:
   schedule:
-    - cron: "31 1 * * *"  # Run at 1:20 UTC
+    - cron: "51 9 * * *"  # Run at 1:20 UTC
     - cron: "0 12 * * *"
     - cron: "0 18 * * *"
     - cron: "0 0 */2 * *"
@@ -35,7 +35,7 @@ jobs:
           timestamp="${{ steps.generate-security-headers.outputs.timestamp }}"
           signature="${{ steps.generate-security-headers.outputs.signature }}"
           
-          if [[ "$hour" == "01"  && "$minute" == "31" || "$hour" == "18" ]]; then
+          if [[ "$hour" == "09"  && "$minute" == "51" || "$hour" == "18" ]]; then
             echo "Triggering JSearch..."
             curl -X POST "https://${{ secrets.API_URL }}/api/jobs/sync?source=jsearch" \
               -H "Origin: ${{ secrets.ORIGIN }}" \

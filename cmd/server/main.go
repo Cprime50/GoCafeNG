@@ -74,6 +74,7 @@ func main() {
 		log.Printf("  Go9jaJobs API is now running at: \033[1;36m%s\033[0m", url)
 		log.Printf("  Status endpoint: \033[1;36m%s/status\033[0m", url)
 		log.Printf("  Jobs endpoint: \033[1;36m%s/api/jobs\033[0m", url)
+		log.Printf("  schedule fetch endpoint: \033[1;36m%s/api/jobs/sync?source\033[0m", url)
 		log.Printf("======================================================")
 		log.Printf("  Remember to include X-API-Key, X-Timestamp, and X-Signature headers")
 		log.Printf("  in all API requests for proper authentication.")

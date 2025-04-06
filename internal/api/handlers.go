@@ -70,6 +70,8 @@ func (h *Handler) SyncJobs(w http.ResponseWriter, r *http.Request) {
 	// Get the source from query parameters
 	source := r.URL.Query().Get("source")
 
+	log.Printf("Received sync request for source: %s", source)
+
 	// Allowed sources
 	validSources := map[string]bool{
 		"jsearch":        true,
@@ -84,19 +86,21 @@ func (h *Handler) SyncJobs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Run sync jobs based on source or run all if source is empty
-	if source == "jsearch" {
-		services.FetchAndSaveJSearch(h.JobFetcher, h.DB)
-	}
-	if source == "indeed" {
-		services.FetchAndSaveIndeed(h.JobFetcher, h.DB)
-	}
-	if source == "linkedin" {
-		services.FetchAndSaveLinkedIn(h.JobFetcher, h.DB)
-	}
-	if source == "apify_linkedin" {
-		services.FetchAndSaveApifyLinkedIn(h.JobFetcher, h.DB)
-	}
+	go func() {
+		// Run sync jobs based on source or run all if source is empty
+		if source == "jsearch" {
+			services.FetchAndSaveJSearch(h.JobFetcher, h.DB)
+		}
+		if source == "indeed" {
+			services.FetchAndSaveIndeed(h.JobFetcher, h.DB)
+		}
+		if source == "linkedin" {
+			services.FetchAndSaveLinkedIn(h.JobFetcher, h.DB)
+		}
+		if source == "apify_linkedin" {
+			services.FetchAndSaveApifyLinkedIn(h.JobFetcher, h.DB)
+		}
+	}()
 
 	response := map[string]interface{}{
 		"success":   true,
