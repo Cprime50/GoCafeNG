@@ -1,11 +1,10 @@
 name: Sync Jobs API Requests
-
 on:
   schedule:
-    - cron: "04 10 * * *"  # Run at 1:20 UTC
-    - cron: "0 12 * * *"
-    - cron: "0 18 * * *"
-    - cron: "0 0 */2 * *"
+    - cron: "36 10 * * *"  # Run at 10:04 UTC
+    - cron: "0 12 * * *"   # Run at 12:00 UTC
+    - cron: "0 18 * * *"   # Run at 18:00 UTC
+    - cron: "0 0 */2 * *"  # Run at 00:00 UTC every 2 days
   
   # Allow manual trigger for testing
   workflow_dispatch:
@@ -23,7 +22,7 @@ jobs:
           echo "timestamp=$timestamp" >> $GITHUB_OUTPUT
           echo "signature=$signature" >> $GITHUB_OUTPUT
       
-      - name: Determine and Trigger Jobs by UTC Hour
+      - name: Determine and Trigger Jobs by UTC Time
         run: |
           hour=$(date -u +"%H")
           minute=$(date -u +"%M")
@@ -35,40 +34,52 @@ jobs:
           timestamp="${{ steps.generate-security-headers.outputs.timestamp }}"
           signature="${{ steps.generate-security-headers.outputs.signature }}"
           
-          if [[ "$hour" == "10"  && "$minute" == "04" || "$hour" == "18" ]]; then
+          # Debugging info
+          echo "Workflow triggered at hour=$hour minute=$minute day=$day"
+          echo "Using timestamp: $timestamp"
+          echo "API URL: ${{ secrets.API_URL }}"
+          
+          # Run JSearch at 10:04 UTC and 18:00 UTC
+          if [[ "$hour" == "10" && "$minute" == "36" ]] || [[ "$hour" == "18" && "$minute" == "00" ]]; then
             echo "Triggering JSearch..."
-            curl -X POST "https://${{ secrets.API_URL }}/api/jobs/sync?source=jsearch" \
+            response=$(curl -v -X POST "https://${{ secrets.API_URL }}/api/jobs/sync?source=jsearch" \
               -H "Origin: ${{ secrets.ORIGIN }}" \
               -H "Content-Type: application/json" \
               -H "X-API-Key: ${{ secrets.API_KEY }}" \
               -H "X-Timestamp: $timestamp" \
-              -H "X-Signature: $signature"
+              -H "X-Signature: $signature")
+            echo "JSearch API Response: $response"
           fi
           
-          if [[ "$hour" == "12" ]]; then
+          # Run Indeed and Apify LinkedIn at 12:00 UTC
+          if [[ "$hour" == "12" && "$minute" == "00" ]]; then
             echo "Triggering Indeed..."
-            curl -X POST "https://${{ secrets.API_URL }}/api/jobs/sync?source=indeed" \
+            response=$(curl -v -X POST "https://${{ secrets.API_URL }}/api/jobs/sync?source=indeed" \
               -H "Origin: ${{ secrets.ORIGIN }}" \
               -H "Content-Type: application/json" \
               -H "X-API-Key: ${{ secrets.API_KEY }}" \
               -H "X-Timestamp: $timestamp" \
-              -H "X-Signature: $signature"
+              -H "X-Signature: $signature")
+            echo "Indeed API Response: $response"
             
             echo "Triggering Apify LinkedIn..."
-            curl -X POST "https://${{ secrets.API_URL }}/api/jobs/sync?source=apify_linkedin" \
+            response=$(curl -v -X POST "https://${{ secrets.API_URL }}/api/jobs/sync?source=apify_linkedin" \
               -H "Origin: ${{ secrets.ORIGIN }}" \
               -H "Content-Type: application/json" \
               -H "X-API-Key: ${{ secrets.API_KEY }}" \
               -H "X-Timestamp: $timestamp" \
-              -H "X-Signature: $signature"
+              -H "X-Signature: $signature")
+            echo "Apify LinkedIn API Response: $response"
           fi
           
-          if (( day % 2 == 0 )) && [[ "$hour" == "00" ]]; then
+          # Run LinkedIn every 2 days at 00:00 UTC
+          if [[ "$hour" == "00" && "$minute" == "00" ]] && (( day % 2 == 0 )); then
             echo "Triggering LinkedIn (every 2 days at 00:00 UTC)..."
-            curl -X POST "https://${{ secrets.API_URL }}/api/jobs/sync?source=linkedin" \
+            response=$(curl -v -X POST "https://${{ secrets.API_URL }}/api/jobs/sync?source=linkedin" \
               -H "Origin: ${{ secrets.ORIGIN }}" \
               -H "Content-Type: application/json" \
               -H "X-API-Key: ${{ secrets.API_KEY }}" \
               -H "X-Timestamp: $timestamp" \
-              -H "X-Signature: $signature"
+              -H "X-Signature: $signature")
+            echo "LinkedIn API Response: $response"
           fi
