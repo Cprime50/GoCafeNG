@@ -44,8 +44,13 @@ func (h *Handler) SetupRoutes(cfg *config.Config) *mux.Router {
 	// Add protected routes to the subrouter with middleware already applied
 	protected.HandleFunc("/jobs", h.GetAllJobs).Methods("GET")
 
-	// New endpoint for job fetching
-	protected.HandleFunc("/jobs/sync", h.SyncJobs).Methods("POST")
+	// Create a subrouter specifically for /jobs/sync with APIKeyAuthSimpleMiddleware
+	jobSyncRouter := r.PathPrefix("/api/jobs/sync").Subrouter()
+	jobSyncRouter.Use(LoggingMiddleware)
+	jobSyncRouter.Use(APIKeyAuthSimpleMiddleware(cfg))
+	jobSyncRouter.Use(SecurityHeadersMiddleware)
+	jobSyncRouter.Use(CORSMiddleware(cfg.AllowedOrigins))
+	jobSyncRouter.HandleFunc("", h.SyncJobs).Methods("POST")
 
 	return r
 }
@@ -81,7 +86,7 @@ func (h *Handler) SyncJobs(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// If source is provided and not in valid list, return error
-	if source != "" && !validSources[source] {
+	if source == "" || !validSources[source] {
 		http.Error(w, fmt.Sprintf("Invalid source: %s", source), http.StatusBadRequest)
 		return
 	}

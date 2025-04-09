@@ -20,6 +20,7 @@ type Config struct {
 	APIKey             string
 	AllowedOrigins     []string
 	AllowedIPs         string
+	CronAPIKey         string
 }
 
 // LoadConfig loads configuration from environment variables
@@ -37,6 +38,7 @@ func LoadConfig() (*Config, error) {
 		APIKey:           os.Getenv("API_KEY"),
 		AllowedOrigins:   parseAllowedOrigins(os.Getenv("ALLOWED_ORIGINS")),
 		AllowedIPs:       os.Getenv("ALLOWED_IPS"),
+		CronAPIKey:     os.Getenv("CRON_API_KEY"),
 	}
 
 	if config.Port == "" {
@@ -50,9 +52,8 @@ func LoadConfig() (*Config, error) {
 	}
 
 	// Warn if secrets are missing
-	if config.APIKey == "" {
-		log.Fatal("API_KEY not set. Exiting.")
-
+	if config.APIKey == "" || config.CronAPIKey == "" {
+		log.Fatal("API_KEY or CRON_API_KEY not set. Exiting.")
 	}
 
 	// Warn if secrets are missing

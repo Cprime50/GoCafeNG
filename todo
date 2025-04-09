@@ -1,18 +1,5 @@
- Rate Limiting
-Add rate limiting to your middleware to restrict the number of requests that can be made using the API key within a specific time frame.
-This prevents abuse even if the key is leaked.
-2. IP Whitelisting
-Restrict access to your API to specific IP addresses or ranges. This ensures that only requests from trusted sources are allowed.
-3. Key Rotation
-Implement a mechanism to rotate API keys periodically. This reduces the risk of long-term exposure if a key is leaked.
-4. Scope and Permissions
-Assign scopes or permissions to API keys. For example, limit what actions a specific key can perform.
-5. HMAC Validation
-Use a server-side secret to validate requests. For example, require the client to sign requests with a hash-based message authentication code (HMAC) using the API key and a timestamp.
-6. Audit and Logging
-Log all requests and monitor for unusual activity, such as requests from unexpected IPs or high request rates.
-Would you like me to implement any of these strategies in your APIKeyAuthMiddleware? If so, let me know which one(s) you'd like to prioritize!
+Docker command
 
-i added gemini api key GEMINI_API_KEY= in .env use it to get all the job description and send them as one prompt to get a better format for the job decsription
-
-build the nextjs project to be ready for deployment as i am abou to deploy it on vercel and what are the steps i should follow
+docker build -t charlesdpj/go9jajobs-prod .
+docker tag charlesdpj/go9jajobs-prod charlesdpj/go9jajobs-prod:latest
+docker push charlesdpj/go9jajobs-prod:latest

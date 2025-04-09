@@ -135,6 +135,29 @@ func APIKeyAuthMiddleware(cfg *config.Config) func(http.Handler) http.Handler {
 	}
 }
 
+// APIKeyAuthSimpleMiddleware is a simpler version of API key authentication middleware
+// that does not use timestamps or HMAC signatures. This is specifically for endpoints
+// like /jobs/sync where simpler authentication is required.
+func APIKeyAuthSimpleMiddleware(cfg *config.Config) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			apiKey := r.Header.Get("X-API-Key")
+			if apiKey == "" {
+				apiKey = r.URL.Query().Get("api_key")
+			}
+
+			if subtle.ConstantTimeCompare([]byte(apiKey), []byte(cfg.CronAPIKey)) != 1 {
+				log.Printf("[AUTH FAIL] %s %s from %s - Invalid API Key attempt", r.Method, r.URL.Path, r.RemoteAddr)
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			log.Printf("[AUTH SUCCESS] %s %s from %s - API Key Validated", r.Method, r.URL.Path, r.RemoteAddr)
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
 // LoggingMiddleware logs requests
 func LoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
