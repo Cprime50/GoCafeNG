@@ -54,4 +54,3 @@ curl -X POST http://localhost:8080/api/jobs/sync?source=jsearch \
 ## Contributing
 Feel free to contribute to this project by submitting issues or pull requests. 
 
-![Job Fetching in Terminal](job-fetching-in-terminal.png)

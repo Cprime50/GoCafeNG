@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"regexp"
 	"strings"
 	"time"
 
@@ -187,41 +186,8 @@ func IsGoRelatedJob(job models.Job) bool {
 	return false
 }
 
-// IsWeirdCharacterJob checks if a job title or description contains unwanted characters
-func IsWeirdCharacterJob(job models.Job) bool {
-	// Define a regex pattern to match unwanted characters
-	weirdCharPattern := `[
-	ÀÁÂÃÄÅĀĂǍȀȂÆàáâãäåāăǎȁȃæ
-	ƁḂḄḆƃɓḃḅḇ
-	ÇĆĈĊČçćĉċč
-	ĎĐḊḌḎḐḒďđḋḍḏḑḓ
-	ÈÉÊËĒĔĖĘĚȄȆèéêëēĕėęěȅȇ
-	ḞƑḟƒ
-	ĜĞĠĢǦǴĝğġģǧǵ
-	ĤĦḢḤḦḨḪĥħḣḥḧḩḫ
-	ÌÍÎÏĨĪĬĮİǏȈȊìíîïĩīĭįıǐȉȋ
-	Ĵǰĵ
-	ĶḰḲḴķḱḳḵ
-	ĹĻĽĿŁḶḸḺḼŀłĺļľḷḹḻḽ
-	ḾṀṂḿṁṃ
-	ÑŃŅŇṄṆṈṊñńņňṅṇṉṋ
-	ÒÓÔÕÖŌŎŐƠǑȌȎØǾœòóôõöōŏőơǒȍȏøǿ
-	ṔṖƤṕṗƥ
-	Ɋʠ
-	ŔŖŘṘṚṞṜŕŗřṙṛṝṟ
-	ŚŜŞŠṠṢṤṦṨśŝşšṡṣṥṧṩ
-	ŢŤŦṪṬṮṰţťŧṫṭṯṱ
-	ÙÚÛÜŨŪŬŮŰŲƯǓȔȖùúûüũūŭůűųưǔȕȗ
-	ṼṾʋṽṿ
-	ŴẀẂẄŵẁẃẅ
-	ẊẌẋẍ
-	ÝŶŸƳỲỴỶỸýŷÿƴỳỵỷỹ
-	ŹŻŽƵẐẒẔźżžƶẑẓẕ]`
-	weirdCharRegex := regexp.MustCompile(weirdCharPattern)
 
-	// Check if the title or description contains unwanted characters
-	return weirdCharRegex.MatchString(job.Title) || weirdCharRegex.MatchString(job.Description)
-}
+
 
 // SaveJobsToDB saves the jobs to the database with duplicate and blocked company filtering
 func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, error) {
@@ -267,7 +233,7 @@ func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, erro
 	skippedDuplicates := 0
 	skippedBlockedCompanies := 0
 	skippedNonGoJobs := 0
-	skippedWeirdCharacterJobs := 0
+
 
 	for _, job := range jobs {
 		// Check for context cancellation
@@ -290,14 +256,8 @@ func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, erro
 			log.Printf("Skipping non-Go related job: %s at %s", job.Title, job.Company)
 			skippedNonGoJobs++
 			continue
-		}
+		 }
 
-		 // Skip jobs with weird characters
-		if IsWeirdCharacterJob(job) {
-			log.Printf("Skipping job with weird characters: %s at %s", job.Title, job.Company)
-			skippedWeirdCharacterJobs++
-			continue
-		}
 
 		// Check for duplicates
 		isDuplicate, err := IsDuplicateJob(ctx, db, job)
@@ -351,8 +311,8 @@ func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, erro
 		return count, err
 	}
 
-	log.Printf("Jobs processed: %d saved, %d duplicates skipped, %d from blocked companies skipped, %d non-Go jobs skipped, %d jobs with weird characters skipped",
-		count, skippedDuplicates, skippedBlockedCompanies, skippedNonGoJobs, skippedWeirdCharacterJobs)
+	log.Printf("Jobs processed: %d saved, %d duplicates skipped, %d from blocked companies skipped, %d non-Go jobs skipped, %d jobs with weird characters skipped, %d non-English jobs skipped",
+		count, skippedDuplicates, skippedBlockedCompanies, skippedNonGoJobs)
 
 	return count, nil
 }
