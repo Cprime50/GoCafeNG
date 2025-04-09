@@ -1,19 +1,20 @@
 # GoJobs NG - Find Golang Jobs in Nigeria
 
-**GoJobs NG** is a platform for Go enjoyers like myself to find job opportunities in Nigeria. It didn't make sense that it you had to use international Go job boards that didnt provide Nigerian specific jobs, so here we are... 
+**GoJobs NG** is a platform for Go enjoyers like myself to find job opportunities in Nigeria. It didn't make sense that you had to use international Go job boards that didnt even provide Nigerian specific jobs,unless you were searching for international jobs they would not be helpful so here we are... 
 
-![Job Fetching in Terminal](job-fetching-in-terminal.png)
+
 
 ## Features
 - Automatically Fetch and sync job listings from multiple sources (e.g., Google jobs, Indeed, LinkedIn).
 - A http endpoint `api/jobs` to get job data.
 
+## Web Application
+Check it out here: [GoJobs NG Web](https://gojobs-ng-web.vercel.app/)
 
 ![Frontend UI](frontend-ui.png)
 ![Frontend UI 2](frontend-ui2.png)
 
-## Web Application
-Check it out here: [GoJobs NG Web](https://gojobs-ng-web.vercel.app/)
+
 
 ## How to Use
 
@@ -53,3 +54,4 @@ curl -X POST http://localhost:8080/api/jobs/sync?source=jsearch \
 ## Contributing
 Feel free to contribute to this project by submitting issues or pull requests. 
 
+![Job Fetching in Terminal](job-fetching-in-terminal.png)
