@@ -311,7 +311,7 @@ func SaveJobsToDB(ctx context.Context, db *sql.DB, jobs []models.Job) (int, erro
 		return count, err
 	}
 
-	log.Printf("Jobs processed: %d saved, %d duplicates skipped, %d from blocked companies skipped, %d non-Go jobs skipped, %d jobs with weird characters skipped, %d non-English jobs skipped",
+	log.Printf("Jobs processed: %d saved, %d duplicates skipped, %d from blocked companies skipped, %d non-Go jobs skipped",
 		count, skippedDuplicates, skippedBlockedCompanies, skippedNonGoJobs)
 
 	return count, nil
